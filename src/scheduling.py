@@ -4,12 +4,9 @@
 """
 
 import argparse
-import datetime
-import hashlib
 import os
-from flask import Flask, render_template, request, redirect
-import sqlalchemy
-import sqlalchemy.ext.declarative
+from flask import Flask, render_template, request, redirect, make_response
+import model
 
 STORAGE_PATH = os.path.join(
     os.environ["HOME"], "Library", "Preferences", "scheduling.sqlite3"
@@ -17,112 +14,54 @@ STORAGE_PATH = os.path.join(
 STORAGE = "sqlite:///" + STORAGE_PATH
 
 
-# W0223: Method 'python_type' is abstract in class 'TypeEngine' but is not overridden
-class Date(sqlalchemy.types.TypeDecorator):  # pylint: disable=W0223
-    """database date format"""
-
-    impl = sqlalchemy.types.Date
-
-    def process_bind_param(self, value, dialect):
-        try:  # if it is a string, parse it, otherwise it must be datetime object
-            return datetime.datetime.strptime(value, "%Y/%m/%d %H:%M:%S")
-        except TypeError:
-            return value
-
-    def process_result_value(self, value, dialect):
-        return value
-
-    def process_literal_param(self, value, dialect):
-        return value
-
-
-Alchemy_Base = sqlalchemy.ext.declarative.declarative_base()
-
-
-class User(Alchemy_Base):
-    """user in database"""
-
-    __tablename__ = "user"
-    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
-    name = sqlalchemy.Column(sqlalchemy.String(50))
-    email = sqlalchemy.Column(sqlalchemy.String(50))
-    password_hash = sqlalchemy.Column(sqlalchemy.String(64))
-    # m = shift manager, a = admin, g = general manager, s = shift worker
-    roles = sqlalchemy.Column(sqlalchemy.String(4))
-    # last_login = sqlalchemy.Column(sqlalchemy.DateTime)
-    # rank = sqlalchemy.Column(sqlalchemy.Float)
-
-    @staticmethod
-    def __hash(text):
-        """hash some random text"""
-        hasher = hashlib.new("sha256")
-        hasher.update(text.encode("utf-8"))
-        return hasher.hexdigest()
-
-    def set_password(self, password):
-        """Set the user password hash"""
-        self.password_hash = User.__hash(password)
-
-    def password_matches(self, password):
-        """does this match the password"""
-        return User.__hash(password) == self.password_hash
-
-    def __repr__(self):
-        """display string"""
-        return f'id = {self.id} name="{self.name}" email="{self.email}"'
-
-
-class Database:
-    """stored information"""
-
-    def __init__(self, db_url):
-        """create db"""
-        self.__db_url = db_url
-        self.__engine = sqlalchemy.create_engine(self.__db_url)
-        factory = sqlalchemy.orm.sessionmaker(bind=self.__engine)
-        session = sqlalchemy.orm.scoped_session(factory)
-        self.__session = session()
-        Alchemy_Base.metadata.create_all(self.__engine)
-
-    def __enter__(self):
-        """for with lifetime statements"""
-        return self
-
-    def __exit__(self, exception_type, exception_value, exception_traceback):
-        """close on end of with lifetime"""
-        print(exception_type, exception_value, exception_traceback)
-        self.close()
-
-    def flush(self):
-        """flush all changes to the database"""
-        self.__session.commit()
-
-    def close(self):
-        """close down the connection to the database"""
-        self.flush()
-        self.__session.close()
-
-
 def create_app(storage_url, source_dir, template_dir):
     """create the flask app"""
     app = Flask(__name__, static_folder=source_dir, template_folder=template_dir)
-    database = Database(storage_url)
+    database = model.Database(storage_url)
 
     @app.route("/")
     def home():
-        return render_template("index.html")
+        user_id = request.cookies.get("user_id")
+        import sys
+
+        sys.stderr.write("user_id = %s\n" % (user_id))
+        user = database.get_user(int(user_id)) if user_id is not None else user_id
+        return render_template("index.html", user=user)
 
     @app.route("/login", methods=["POST"])
     def login():
+        import sys
+
         email = request.form["email"]
         password = request.form["password"]
-        print([email, password])
-        return redirect("/welcome")
+        user = database.find_user(email)
+        sys.stderr.write("email = %s user = %s\n" % (email, user))
+        if user is None and email.lower() == "marcallenpage@gmail.com":
+            user = database.create_user(email, password, "Marc", 0.0)
+            sys.stderr.write("CREATED: email = %s user = %s\n" % (email, user))
+        elif user is None:
+            return redirect("/#user_not_found")
+
+        response = make_response(redirect("/welcome"))
+        response.set_cookie("user_id", str(user.id))
+        sys.stderr.write("COOKIE SET\n")
+        return response
+
+    @app.route("/restaurant/<restaurant_id>")
+    def restaurant(restaurant_id):
+        found = database.get_restaurant(restaurant_id)
+        if not found:
+            return (render_template("404.html", path="???"), 404)
+        return render_template("resteraunt.html", restaurant=found)
 
     @app.route("/welcome")
     def welcome():
-        database.flush()
-        return render_template("welcome.html")
+        user_id = request.cookies.get("user_id")
+        import sys
+
+        sys.stderr.write("user_id = %s\n" % (user_id))
+        user = database.get_user(int(user_id)) if user_id is not None else user_id
+        return render_template("welcome.html", user=user)
 
     @app.errorhandler(404)
     def page_not_found(error):
