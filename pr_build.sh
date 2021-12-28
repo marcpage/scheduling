@@ -7,9 +7,10 @@ else
     export VENV_DIR=$HOME/.venv/scheduling;
 fi
 
+#echo Creating Python venv: $VENV_DIR
 mkdir -p $VENV_DIR
 python3 -m venv $VENV_DIR
-source $VENV_DIR/bin/activate
+. $VENV_DIR/bin/activate
 
 pip3 install -qr Requirements.txt
 
