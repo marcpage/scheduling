@@ -5,7 +5,9 @@
 
 import argparse
 import os
+
 from flask import Flask, render_template, request, redirect, make_response
+
 import model
 
 STORAGE_PATH = os.path.join(
