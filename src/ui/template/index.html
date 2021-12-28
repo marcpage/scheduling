@@ -1,0 +1,22 @@
+<html>
+<body>
+<form method='POST' action="/login">
+    <input name="email"
+            type="text"
+            minlength=5
+            placeholder="email address"
+            size=25
+            pattern="[^@ \t\r\n]+@[^@]+\.[^@]+"
+            title="your email address"
+            requred autofocus />
+    <input name="password"
+            type="password"
+            minlength=5
+            placeholder="password"
+            size=25
+            title="your password"
+            requred />
+    <input type="submit"/>
+</form>
+</body>
+</html>
