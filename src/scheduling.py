@@ -36,7 +36,7 @@ def create_app(storage_url, source_dir, template_dir):
             return redirect("/#user_not_found")
 
         response = make_response(redirect("/welcome"))
-        response.set_cookie("user_id", str(user.id))
+        response.set_cookie("user_id", str(user.id), secure=True)
         return response
 
     @app.route("/restaurant/<restaurant_id>")
