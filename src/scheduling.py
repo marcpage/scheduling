@@ -22,29 +22,21 @@ def create_app(storage_url, source_dir, template_dir):
     @app.route("/")
     def home():
         user_id = request.cookies.get("user_id")
-        import sys
-
-        sys.stderr.write("user_id = %s\n" % (user_id))
         user = database.get_user(int(user_id)) if user_id is not None else user_id
         return render_template("index.html", user=user)
 
     @app.route("/login", methods=["POST"])
     def login():
-        import sys
-
         email = request.form["email"]
         password = request.form["password"]
         user = database.find_user(email)
-        sys.stderr.write("email = %s user = %s\n" % (email, user))
         if user is None and email.lower() == "marcallenpage@gmail.com":
             user = database.create_user(email, password, "Marc", 0.0)
-            sys.stderr.write("CREATED: email = %s user = %s\n" % (email, user))
         elif user is None:
             return redirect("/#user_not_found")
 
         response = make_response(redirect("/welcome"))
         response.set_cookie("user_id", str(user.id))
-        sys.stderr.write("COOKIE SET\n")
         return response
 
     @app.route("/restaurant/<restaurant_id>")
@@ -57,9 +49,7 @@ def create_app(storage_url, source_dir, template_dir):
     @app.route("/welcome")
     def welcome():
         user_id = request.cookies.get("user_id")
-        import sys
 
-        sys.stderr.write("user_id = %s\n" % (user_id))
         user = database.get_user(int(user_id)) if user_id is not None else user_id
         return render_template("welcome.html", user=user)
 
