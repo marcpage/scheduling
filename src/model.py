@@ -61,6 +61,7 @@ default_shift_roles = sqlalchemy.Table(
     sqlalchemy.Column("default_shift_id", sqlalchemy.ForeignKey("default_shift.id")),
 )
 
+
 # R0903: Too few public methods (0/2) (too-few-public-methods)
 class DefaultShift(Alchemy_Base):  # pylint: disable=R0903
     """doc string"""
@@ -92,6 +93,7 @@ shift_roles = sqlalchemy.Table(
     sqlalchemy.Column("role_id", sqlalchemy.ForeignKey("role.id")),
     sqlalchemy.Column("shift_id", sqlalchemy.ForeignKey("shift.id")),
 )
+
 
 # R0903: Too few public methods (0/2) (too-few-public-methods)
 class Shift(Alchemy_Base):  # pylint: disable=R0903
@@ -332,7 +334,7 @@ class Database:
 
     def create_user(self, email, password, name, hours):
         """doc string"""
-        self.__add(
+        return self.__add(
             User(
                 email=email,
                 password_hash=User.hash_password(password),
@@ -342,6 +344,7 @@ class Database:
         )
 
     def get_user(self, user_id):
+        """doc string"""
         query = self.__session.query(User)
         return query.filter(User.id == user_id).one_or_none()
 
