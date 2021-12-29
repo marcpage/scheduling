@@ -29,6 +29,7 @@
             <li>{{ role.name }}</li>
         {% endfor %}
         </ul>
+        Add roles in the order new employees normally progress.
         <form action="/restaurant/{{ restaurant.id }}/add_role" method="POST">
             <input name="name"
                     type="text"

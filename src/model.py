@@ -295,7 +295,7 @@ class User(Alchemy_Base):  # pylint: disable=R0903
 
     def password_matches(self, password):
         """does this match the password"""
-        return User.__hash(password) == self.password_hash
+        return User.hash_password(password) == self.password_hash
 
     def __repr__(self):
         """display string"""
@@ -340,6 +340,7 @@ class Database:
 
     def create_user(self, email, password, name, **kwargs):
         """doc string"""
+        found = self.find_user(email)
         return self.__add(
             User(
                 email=email,
@@ -347,7 +348,7 @@ class Database:
                 name=name,
                 **kwargs,
             )
-        )
+        ) if found is None else found
 
     def get_user(self, user_id):
         """doc string"""
