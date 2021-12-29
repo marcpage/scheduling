@@ -48,9 +48,16 @@ def create_app(storage_url, source_dir, template_dir):
         user_id = request.cookies.get("user_id")
         user = database.get_user(int(user_id)) if user_id is not None else user_id
         found = database.get_restaurant(restaurant_id)
+
         if not found:
             return (render_template("404.html", path="???"), 404)
-        return render_template("restaurant.html", restaurant=found, user=user)
+
+        admin_user = user.admin if user is not None else False
+        user_list = database.get_users() if admin_user else []
+
+        return render_template(
+            "restaurant.html", restaurant=found, user=user, user_list=user_list
+        )
 
     @app.route("/create_restaurant", methods=["POST"])
     def create_restaurant():
@@ -70,6 +77,18 @@ def create_app(storage_url, source_dir, template_dir):
         admin_user = user.admin if user is not None else False
         user_list = database.get_users() if admin_user else []
         restaurant_list = database.get_restaurants() if admin_user else []
+        print(
+            [
+                "user_id",
+                user_id,
+                "user",
+                user,
+                "admin_user",
+                admin_user,
+                "user_list",
+                user_list,
+            ]
+        )
         return render_template(
             "welcome.html",
             user=user,
