@@ -3,18 +3,34 @@
 <h1>Welcome {{ user.name }}</h1>
 
     {% if user.admin %}
-    Hey, admin.
-    <h2>Create Restaurant</h2>
-    <form action="/create_restaurant" method="POST">
-        <input name="name"
-                type="text"
-                minlength=5
-                placeholder="Restaurant Name"
-                size=25
-                title="The Restaurant Name"
-                requred autofocus />
-        <input type="submit"/>
-    </form>
+        Hey, admin.
+
+        <h2>Create Restaurant</h2>
+        <form action="/create_restaurant" method="POST">
+            <input name="name"
+                    type="text"
+                    minlength=5
+                    placeholder="Restaurant Name"
+                    size=25
+                    title="The Restaurant Name"
+                    requred autofocus />
+            <input type="submit"/>
+        </form>
+
+        <h2>Users</h2>
+        <ul>
+        {% for user in user_list %}
+            <li>{{ user.name }} ({{ user.email }})</li>
+        {% endfor %}
+        </ul>
+
+        <h2>Restaurants</h2>
+        <ul>
+        {% for restaurant in restaurant_list %}
+            <li><a href="/restaurant/{{ restaurant.id }}">{{ restaurant.name }}</a> (GM: {{ restaurant.gm }})</li>
+        {% endfor %}
+        </ul>
+
     {% endif %}
 
 </body>

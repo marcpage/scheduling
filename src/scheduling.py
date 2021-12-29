@@ -66,9 +66,16 @@ def create_app(storage_url, source_dir, template_dir):
     @app.route("/welcome")
     def welcome():
         user_id = request.cookies.get("user_id")
-
         user = database.get_user(int(user_id)) if user_id is not None else user_id
-        return render_template("welcome.html", user=user)
+        admin_user = user.admin if user is not None else False
+        user_list = database.get_users() if admin_user else []
+        restaurant_list = database.get_restaurants() if admin_user else []
+        return render_template(
+            "welcome.html",
+            user=user,
+            user_list=user_list,
+            restaurant_list=restaurant_list,
+        )
 
     @app.errorhandler(404)
     def page_not_found(error):
