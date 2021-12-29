@@ -5,6 +5,8 @@
 
 import datetime
 import hashlib
+import queue
+import threading
 
 import sqlalchemy
 import sqlalchemy.ext.declarative
@@ -272,6 +274,7 @@ class User(Alchemy_Base):  # pylint: disable=R0903
     email = sqlalchemy.Column(sqlalchemy.String(50))
     password_hash = sqlalchemy.Column(sqlalchemy.String(64))
     hours_limit = sqlalchemy.Column(sqlalchemy.Integer)
+    admin = sqlalchemy.Column(sqlalchemy.Boolean)
     # m = schedule manager, a = admin, g = general manager, s = shift worker
     # roles = sqlalchemy.Column(sqlalchemy.String(4))
     # last_login = sqlalchemy.Column(sqlalchemy.DateTime)
@@ -297,40 +300,60 @@ class User(Alchemy_Base):  # pylint: disable=R0903
         return f'id = {self.id} name="{self.name}" email="{self.email}"'
 
 
-class Database:
+class Database(threading.Thread):
     """stored information"""
 
     def __init__(self, db_url):
         """create db"""
         self.__db_url = db_url
-        self.__engine = sqlalchemy.create_engine(self.__db_url)
-        factory = sqlalchemy.orm.sessionmaker(bind=self.__engine)
-        session = sqlalchemy.orm.scoped_session(factory)
-        self.__session = session()
-        Alchemy_Base.metadata.create_all(self.__engine)
+        self.__messages = queue.Queue()
+        threading.Thread.__init__(self)
+        self.daemon = True
+        self.start()
 
-    def __enter__(self):
-        """for with lifetime statements"""
-        return self
+    @staticmethod
+    def __add_(session, entry):
+        session.add(entry)
+        session.commit()
+        return entry
 
-    def __exit__(self, exception_type, exception_value, exception_traceback):
-        """close on end of with lifetime"""
-        print(exception_type, exception_value, exception_traceback)
-        self.close()
+    @staticmethod
+    def __flush_(session):
+        session.commit()
+        return True
+
+    @staticmethod
+    def __close_(session):
+        session.commit()
+        session.close()
+        return True
 
     def __add(self, entry):
-        self.__session.add(entry)
-        self.flush()
-        return entry
+        result = queue.Queue()
+        self.__messages.put((result, lambda s: Database.__add_(s, entry)))
+        return result.get()
+
+    def run(self):
+        engine = sqlalchemy.create_engine(self.__db_url)
+        factory = sqlalchemy.orm.sessionmaker(bind=engine)
+        session_creator = sqlalchemy.orm.scoped_session(factory)
+        session = session_creator()
+        Alchemy_Base.metadata.create_all(engine)
+        while True:
+            (result, command) = self.__messages.get()
+            result.put(command(session))
 
     def flush(self):
         """flush all changes to the database"""
-        self.__session.commit()
+        result = queue.Queue()
+        self.__messages.put((result, Database.__flush_))
+        result.get()
 
     def close(self):
         """close down the connection to the database"""
-        self.flush()
-        self.__session.close()
+        result = queue.Queue()
+        self.__messages.put((result, Database.__close_))
+        result.get()
 
     def create_user(self, email, password, name, hours):
         """doc string"""
@@ -345,17 +368,36 @@ class Database:
 
     def get_user(self, user_id):
         """doc string"""
-        query = self.__session.query(User)
-        return query.filter(User.id == user_id).one_or_none()
+        result = queue.Queue()
+        self.__messages.put(
+            (result, lambda s: s.query(User).filter(User.id == user_id).one_or_none())
+        )
+        return result.get()
 
     def find_user(self, email):
         """doc string"""
-        query = self.__session.query(User)
-        return query.filter(
-            sqlalchemy.func.lower(User.email) == sqlalchemy.func.lower(email)
-        ).one_or_none()
+        result = queue.Queue()
+        self.__messages.put(
+            (
+                result,
+                lambda s: s.query(User)
+                .filter(
+                    sqlalchemy.func.lower(User.email) == sqlalchemy.func.lower(email)
+                )
+                .one_or_none(),
+            )
+        )
+        return result.get()
 
     def get_restaurant(self, restaurant_id):
         """doc string"""
-        query = self.__session.query(Restaurant)
-        return query.filter(Restaurant.id == restaurant_id).one_or_none()
+        result = queue.Queue()
+        self.__messages.put(
+            (
+                result,
+                lambda s: s.query(Restaurant)
+                .filter(Restaurant.id == restaurant_id)
+                .one_or_none(),
+            )
+        )
+        return result.get()
