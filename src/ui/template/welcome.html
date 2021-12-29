@@ -1,7 +1,7 @@
 <html>
 <body>
 <h1>Welcome {{ user.name }}</h1>
-    <a href="/logout">logout</a>
+    <a href="/logout">logout</a><br/>
     {% if user.admin %}
         Hey, admin.
 
@@ -27,11 +27,30 @@
         <h2>Restaurants</h2>
         <ul>
         {% for restaurant in restaurant_list %}
-            <li><a href="/restaurant/{{ restaurant.id }}">{{ restaurant.name }}</a> (GM: {{ restaurant.gm }})</li>
+            <li><a href="/restaurant/{{ restaurant.id }}">{{ restaurant.name }}</a>
+                (GM: {{ restaurant.gm }})</li>
         {% endfor %}
         </ul>
 
     {% endif %}
 
+    <ul>
+    {% for restaurant in user.gm_at %}
+        <li><a href="/restaurant/{{ restaurant.id }}">{{ restaurant.name }}</a></li>
+    {% endfor %}
+    </ul>
+
+    <ul>
+    {% for restaurant in user_restaurants %}
+        <li><a href="/restaurant/{{ restaurant.id }}">{{ restaurant.name }}</a></li>
+        <ul>
+            {% for role in sorted_roles %}
+                {% if role.role.restaurant_id == restaurant.id %}
+                    <li>{{ role.role.name }}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% endfor %}
+    </ul>
 </body>
 </html>

@@ -65,7 +65,7 @@ default_shift_roles = sqlalchemy.Table(
 
 # R0903: Too few public methods (0/2) (too-few-public-methods)
 class DefaultShift(Alchemy_Base):  # pylint: disable=R0903
-    """doc string"""
+    """Default shifts to be scheduled during a date range"""
 
     __tablename__ = "default_shift"
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
@@ -98,7 +98,7 @@ shift_roles = sqlalchemy.Table(
 
 # R0903: Too few public methods (0/2) (too-few-public-methods)
 class Shift(Alchemy_Base):  # pylint: disable=R0903
-    """doc string"""
+    """An actual shift instance"""
 
     __tablename__ = "shift"
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
@@ -257,6 +257,7 @@ class Restaurant(Alchemy_Base):  # pylint: disable=R0903
     name = sqlalchemy.Column(sqlalchemy.String(50))
     gm_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"))
     gm = sqlalchemy.orm.relationship("User")
+    roles = sqlalchemy.orm.relationship("Role")
 
     def __repr__(self):
         """display string"""
@@ -274,6 +275,8 @@ class User(Alchemy_Base):  # pylint: disable=R0903
     password_hash = sqlalchemy.Column(sqlalchemy.String(64))
     hours_limit = sqlalchemy.Column(sqlalchemy.Integer)
     admin = sqlalchemy.Column(sqlalchemy.Boolean)
+    gm_at = sqlalchemy.orm.relationship("Restaurant")
+    roles = sqlalchemy.orm.relationship("UserRolePreference")
     # m = schedule manager, a = admin, g = general manager, s = shift worker
     # roles = sqlalchemy.Column(sqlalchemy.String(4))
     # last_login = sqlalchemy.Column(sqlalchemy.DateTime)
@@ -354,6 +357,19 @@ class Database:
             else None
         )
 
+    def add_user_to_restaurant(self, user, restaurant):
+        """doc string"""
+        priority = 1.0
+        for role in restaurant.roles:
+            self.__add(
+                UserRolePreference(
+                    user_id=user.id,
+                    role_id=role.id,
+                    priority=priority,
+                )
+            )
+            priority += 1.0
+
     def find_user(self, email):
         """doc string"""
         return (
@@ -366,6 +382,10 @@ class Database:
     def get_users(self):
         """doc string"""
         return self.__session().query(User).all()
+
+    def create_role(self, restaurant_id, name):
+        """doc string"""
+        return self.__add(Role(name=name, restaurant_id=restaurant_id))
 
     def create_restaurant(self, name):
         """doc string"""

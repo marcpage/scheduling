@@ -4,12 +4,15 @@
 
     {% if user.admin %}
 
+        <a href="/logout">logout</a><br/>
         General Manager: {{ restaurant.gm }}
 
         <form action="/restaurant/{{ restaurant.id }}/set_gm" method="POST">
             <select name="gm_id">
                 {% for user in user_list %}
-                    <option value="{{ user.id }}"{% if restaurant.gm and restaurant.gm.id == user.id%} selected{% endif %}>{{ user.name }} ({{ user.email }})</li>
+                    <option value="{{ user.id }}"
+                        {% if restaurant.gm
+                            and restaurant.gm.id == user.id%} selected{% endif %}>{{ user.name }} ({{ user.email }})</li>
                 {% endfor %}
             </select>
             <input type="submit" value="set"/>
@@ -17,10 +20,28 @@
 
     {% elif user.id == restaurant.gm_id %}
 
-        Welcome, GM
+        <a href="/logout">logout</a><br/>
+        Welcome, {{ user.name }}
 
+        <h2>Roles</h2>
+        <ul>
+        {% for role in restaurant.roles %}
+            <li>{{ role.name }}</li>
+        {% endfor %}
+        </ul>
+        <form action="/restaurant/{{ restaurant.id }}/add_role" method="POST">
+            <input name="name"
+                    type="text"
+                    minlength=3
+                    placeholder="Role"
+                    size=10
+                    title="Name of the role"
+                    requred autofocus />
+            <input type="submit" value="add"/>
+        </form>
     {% elif user %}
 
+        <a href="/logout">logout</a><br/>
         Welcome, {{ user.name }}. You have been invited to join our team.
 
         Add user to restaurant
