@@ -348,7 +348,11 @@ class Database:
 
     def get_user(self, user_id):
         """doc string"""
-        return self.__session().query(User).filter(User.id == user_id).one_or_none()
+        return (
+            self.__session().query(User).filter(User.id == int(user_id)).one_or_none()
+            if user_id is not None
+            else None
+        )
 
     def find_user(self, email):
         """doc string"""
@@ -370,10 +374,14 @@ class Database:
     def get_restaurant(self, restaurant_id):
         """doc string"""
         return (
-            self.__session()
-            .query(Restaurant)
-            .filter(Restaurant.id == restaurant_id)
-            .one_or_none()
+            (
+                self.__session()
+                .query(Restaurant)
+                .filter(Restaurant.id == restaurant_id)
+                .one_or_none()
+            )
+            if restaurant_id is not None
+            else None
         )
 
     def get_restaurants(self):

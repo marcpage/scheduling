@@ -27,8 +27,33 @@
 
     {% else %}
 
-        Create new user here
-        Add user to restaurant
+        Welcome, you have been invited to join the {{ restaurant.name }} family.
+        <form action="/create_user" method="POST">
+            <input name="name"
+                    type="text"
+                    minlength=5
+                    placeholder="first and last name"
+                    size=25
+                    title="your name"
+                    requred autofocus /><br/>
+            <input name="email"
+                    type="text"
+                    minlength=5
+                    placeholder="email address"
+                    size=25
+                    pattern="[^@ \t\r\n]+@[^@]+\.[^@]+"
+                    title="your email address"
+                    requred /><br/>
+            <input name="password"
+                    type="password"
+                    minlength=5
+                    placeholder="password"
+                    size=25
+                    title="your password"
+                    requred />
+            <input type="hidden" name="restaurant_id" value="{{ restaurant.id }}"/>
+            <input type="submit" value="join"/>
+        </form>
 
     {% endif %}
 
