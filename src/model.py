@@ -359,6 +359,9 @@ class Database:
             .one_or_none()
         )
 
+    def get_users(self):
+        return self.__session().query(User).all()
+
     def create_restaurant(self, name):
         """doc string"""
         return self.__add(Restaurant(name=name))
@@ -371,3 +374,6 @@ class Database:
             .filter(Restaurant.id == restaurant_id)
             .one_or_none()
         )
+
+    def get_restaurants(self):
+        return self.__session().query(Restaurant).all()
