@@ -360,6 +360,7 @@ class Database:
         )
 
     def get_users(self):
+        """doc string"""
         return self.__session().query(User).all()
 
     def create_restaurant(self, name):
@@ -376,4 +377,5 @@ class Database:
         )
 
     def get_restaurants(self):
+        """doc string"""
         return self.__session().query(Restaurant).all()

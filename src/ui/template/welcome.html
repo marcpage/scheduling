@@ -27,7 +27,7 @@
         <h2>Restaurants</h2>
         <ul>
         {% for restaurant in restaurant_list %}
-            <li>{{ restaurant.name }} (GM: {{ restaurant.gm }})</li>
+            <li><a href="/restaurant/{{ restaurant.id }}">{{ restaurant.name }}</a> (GM: {{ restaurant.gm }})</li>
         {% endfor %}
         </ul>
 
