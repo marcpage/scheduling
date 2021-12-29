@@ -25,8 +25,14 @@ def create_app(storage_url, source_dir, template_dir):
     @app.route("/")
     def home():
         user_id = request.cookies.get(USER_ID_COOKIE)
-        user = database.get_user(int(user_id)) if user_id is not None else user_id
+        user = database.get_user(user_id)
         return render_template("index.html", user=user)
+
+    @app.route("/logout")
+    def logout():
+        response = make_response(redirect("/"))
+        response.set_cookie(USER_ID_COOKIE, "", expires=0)
+        return response
 
     @app.route("/login", methods=["POST"])
     def login():
@@ -44,10 +50,27 @@ def create_app(storage_url, source_dir, template_dir):
         response.set_cookie(USER_ID_COOKIE, str(user.id), secure=False)
         return response
 
+    @app.route("/create_user", methods=["POST"])
+    def create_user():
+        # TODO: make sure the email is unique # pylint: disable=W0511
+        name = request.form["name"]
+        email = request.form["email"]
+        password = request.form["password"]
+        user = database.create_user(
+            email, password, name, hours_limit=40.0, admin=False
+        )
+        restaurant_id = request.form["restaurant_id"]
+        restaurant = database.get_restaurant(restaurant_id)
+        if restaurant is not None:
+            pass  # TODO: add user roles # pylint: disable=W0511
+        response = make_response(redirect("/welcome"))
+        response.set_cookie(USER_ID_COOKIE, str(user.id), secure=False)
+        return response
+
     @app.route("/restaurant/<restaurant_id>")
     def restaurant(restaurant_id):
         user_id = request.cookies.get(USER_ID_COOKIE)
-        user = database.get_user(int(user_id)) if user_id is not None else user_id
+        user = database.get_user(user_id)
         found = database.get_restaurant(restaurant_id)
 
         if not found:
@@ -63,7 +86,7 @@ def create_app(storage_url, source_dir, template_dir):
     @app.route("/create_restaurant", methods=["POST"])
     def create_restaurant():
         user_id = request.cookies.get(USER_ID_COOKIE)
-        user = database.get_user(int(user_id)) if user_id is not None else user_id
+        user = database.get_user(user_id)
 
         if user is None or not user.admin:
             return (render_template("404.html", path="???"), 404)
@@ -74,9 +97,9 @@ def create_app(storage_url, source_dir, template_dir):
     @app.route("/restaurant/<restaurant_id>/set_gm", methods=["POST"])
     def set_restaurant_gm(restaurant_id):
         user_id = request.cookies.get(USER_ID_COOKIE)
-        user = database.get_user(int(user_id)) if user_id is not None else user_id
+        user = database.get_user(user_id)
         gm_id = request.form["gm_id"]
-        general_manager = database.get_user(gm_id) if gm_id is not None else None
+        general_manager = database.get_user(gm_id)
         if user is None or not user.admin or general_manager is None:
             return (render_template("404.html", path="???"), 404)
         found = database.get_restaurant(restaurant_id)
@@ -87,7 +110,7 @@ def create_app(storage_url, source_dir, template_dir):
     @app.route("/welcome")
     def welcome():
         user_id = request.cookies.get(USER_ID_COOKIE)
-        user = database.get_user(int(user_id)) if user_id is not None else user_id
+        user = database.get_user(user_id)
         admin_user = user.admin if user is not None else False
         user_list = database.get_users() if admin_user else []
         restaurant_list = database.get_restaurants() if admin_user else []
