@@ -3,11 +3,33 @@
 <h1>{{ restaurant.name }}</h1>
 
     {% if user.admin %}
-        General Manager: {{ restaurant.gm }}
-    {% endif %}
 
-    {% if user.id == restaurant.gm_id %}
+        General Manager: {{ restaurant.gm }}
+
+        <form action="/restaurant/{{ restaurant.id }}/set_gm" method="POST">
+            <select name="user">
+                {% for user in user_list %}
+                    <option value="{{ user.id }}"{% if restaurant.gm and restaurant.gm.id == user.id%} selected{% endif %}>{{ user.name }} ({{ user.email }})</li>
+                {% endfor %}
+            </select>
+            <input type="submit" value="set"/>
+        </form>
+
+    {% elif user.id == restaurant.gm_id %}
+
         Welcome, GM
+
+    {% elif user %}
+
+        Welcome, {{ user.name }}. You have been invited to join our team.
+
+        Add user to restaurant
+
+    {% else %}
+
+        Create new user here
+        Add user to restaurant
+
     {% endif %}
 
 </body>
