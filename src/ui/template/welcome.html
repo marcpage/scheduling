@@ -1,5 +1,21 @@
 <html>
 <body>
 <h1>Welcome {{ user.name }}</h1>
+
+    {% if user.admin %}
+    Hey, admin.
+    <h2>Create Restaurant</h2>
+    <form action="/create_restaurant" method="POST">
+        <input name="name"
+                type="text"
+                minlength=5
+                placeholder="Restaurant Name"
+                size=25
+                title="The Restaurant Name"
+                requred autofocus />
+        <input type="submit"/>
+    </form>
+    {% endif %}
+
 </body>
 </html>

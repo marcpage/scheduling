@@ -1,5 +1,14 @@
 <html>
 <body>
 <h1>{{ restaurant.name }}</h1>
+
+    {% if user.admin %}
+        General Manager: {{ restaurant.gm }}
+    {% endif %}
+
+    {% if user.id == restaurant.gm_id %}
+        Welcome, GM
+    {% endif %}
+
 </body>
 </html>
