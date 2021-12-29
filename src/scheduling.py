@@ -33,7 +33,9 @@ def create_app(storage_url, source_dir, template_dir):
         password = request.form["password"]
         user = database.find_user(email)
         if user is None and email.lower() == "marcallenpage@gmail.com":
-            user = database.create_user(email, password, "Marc", 0.0)
+            user = database.create_user(
+                email, password, "Marc", hours_limit=0.0, admin=True
+            )
         elif user is None:
             return redirect("/#user_not_found")
 
@@ -43,10 +45,23 @@ def create_app(storage_url, source_dir, template_dir):
 
     @app.route("/restaurant/<restaurant_id>")
     def restaurant(restaurant_id):
+        user_id = request.cookies.get("user_id")
+        user = database.get_user(int(user_id)) if user_id is not None else user_id
         found = database.get_restaurant(restaurant_id)
         if not found:
             return (render_template("404.html", path="???"), 404)
-        return render_template("resteraunt.html", restaurant=found)
+        return render_template("restaurant.html", restaurant=found, user=user)
+
+    @app.route("/create_restaurant", methods=["POST"])
+    def create_restaurant():
+        user_id = request.cookies.get("user_id")
+        user = database.get_user(int(user_id)) if user_id is not None else user_id
+
+        if user is None or not user.admin:
+            return (render_template("404.html", path="???"), 404)
+
+        created = database.create_restaurant(request.form["name"])
+        return redirect(f"/restaurant/{created.id}")
 
     @app.route("/welcome")
     def welcome():

@@ -5,7 +5,6 @@
 
 import datetime
 import hashlib
-import queue
 import threading
 
 import sqlalchemy
@@ -300,104 +299,75 @@ class User(Alchemy_Base):  # pylint: disable=R0903
         return f'id = {self.id} name="{self.name}" email="{self.email}"'
 
 
-class Database(threading.Thread):
+class Database:
     """stored information"""
 
     def __init__(self, db_url):
         """create db"""
         self.__db_url = db_url
-        self.__messages = queue.Queue()
-        threading.Thread.__init__(self)
-        self.daemon = True
-        self.start()
+        self.__sessions = {}
+        self.__session_lock = threading.Lock()
+        engine = sqlalchemy.create_engine(self.__db_url)
+        self.__factory = sqlalchemy.orm.sessionmaker(bind=engine)
+        Alchemy_Base.metadata.create_all(engine)
+        self.__session_creator = sqlalchemy.orm.scoped_session(self.__factory)
 
-    @staticmethod
-    def __add_(session, entry):
-        session.add(entry)
-        session.commit()
-        return entry
+    def __session(self):
+        thread_id = threading.current_thread().ident
 
-    @staticmethod
-    def __flush_(session):
-        session.commit()
-        return True
+        with self.__session_lock:
+            if thread_id not in self.__sessions:
+                self.__sessions[thread_id] = self.__session_creator()
 
-    @staticmethod
-    def __close_(session):
-        session.commit()
-        session.close()
-        return True
+        return self.__sessions[thread_id]
 
     def __add(self, entry):
-        result = queue.Queue()
-        self.__messages.put((result, lambda s: Database.__add_(s, entry)))
-        return result.get()
-
-    def run(self):
-        engine = sqlalchemy.create_engine(self.__db_url)
-        factory = sqlalchemy.orm.sessionmaker(bind=engine)
-        session_creator = sqlalchemy.orm.scoped_session(factory)
-        session = session_creator()
-        Alchemy_Base.metadata.create_all(engine)
-        while True:
-            (result, command) = self.__messages.get()
-            result.put(command(session))
+        self.__session().add(entry)
+        self.__session().commit()
+        return entry
 
     def flush(self):
         """flush all changes to the database"""
-        result = queue.Queue()
-        self.__messages.put((result, Database.__flush_))
-        result.get()
+        self.__session().commit()
 
     def close(self):
         """close down the connection to the database"""
-        result = queue.Queue()
-        self.__messages.put((result, Database.__close_))
-        result.get()
+        self.__session().commit()
+        self.__session().close()
 
-    def create_user(self, email, password, name, hours):
+    def create_user(self, email, password, name, **kwargs):
         """doc string"""
         return self.__add(
             User(
                 email=email,
                 password_hash=User.hash_password(password),
                 name=name,
-                hours_limit=hours,
+                **kwargs,
             )
         )
 
     def get_user(self, user_id):
         """doc string"""
-        result = queue.Queue()
-        self.__messages.put(
-            (result, lambda s: s.query(User).filter(User.id == user_id).one_or_none())
-        )
-        return result.get()
+        return self.__session().query(User).filter(User.id == user_id).one_or_none()
 
     def find_user(self, email):
         """doc string"""
-        result = queue.Queue()
-        self.__messages.put(
-            (
-                result,
-                lambda s: s.query(User)
-                .filter(
-                    sqlalchemy.func.lower(User.email) == sqlalchemy.func.lower(email)
-                )
-                .one_or_none(),
-            )
+        return (
+            self.__session()
+            .query(User)
+            .filter(sqlalchemy.func.lower(User.email) == sqlalchemy.func.lower(email))
+            .one_or_none()
         )
-        return result.get()
+
+    def create_restaurant(self, name):
+        """doc string"""
+        return self.__add(Restaurant(name=name))
 
     def get_restaurant(self, restaurant_id):
         """doc string"""
-        result = queue.Queue()
-        self.__messages.put(
-            (
-                result,
-                lambda s: s.query(Restaurant)
-                .filter(Restaurant.id == restaurant_id)
-                .one_or_none(),
-            )
+        return (
+            self.__session()
+            .query(Restaurant)
+            .filter(Restaurant.id == restaurant_id)
+            .one_or_none()
         )
-        return result.get()
