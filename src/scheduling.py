@@ -17,15 +17,15 @@ STORAGE = "sqlite:///" + STORAGE_PATH
 USER_ID_COOKIE = "session"
 
 
-def create_app(storage_url, source_dir, template_dir):
+# R0915: Too many statements (51/50) (too-many-statements)
+def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0915
     """create the flask app"""
     app = Flask(__name__, static_folder=source_dir, template_folder=template_dir)
     database = model.Database(storage_url)
 
     @app.route("/")
     def home():
-        user_id = request.cookies.get(USER_ID_COOKIE)
-        user = database.get_user(user_id)
+        user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         return render_template("index.html", user=user)
 
     @app.route("/logout")
@@ -59,18 +59,16 @@ def create_app(storage_url, source_dir, template_dir):
         user = database.create_user(
             email, password, name, hours_limit=40.0, admin=False
         )
-        restaurant_id = request.form["restaurant_id"]
-        restaurant = database.get_restaurant(restaurant_id)
+        restaurant = database.get_restaurant(request.form["restaurant_id"])
         if restaurant is not None:
-            pass  # TODO: add user roles # pylint: disable=W0511
+            database.add_user_to_restaurant(user, restaurant)
         response = make_response(redirect("/welcome"))
         response.set_cookie(USER_ID_COOKIE, str(user.id), secure=False)
         return response
 
     @app.route("/restaurant/<restaurant_id>")
     def restaurant(restaurant_id):
-        user_id = request.cookies.get(USER_ID_COOKIE)
-        user = database.get_user(user_id)
+        user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         found = database.get_restaurant(restaurant_id)
 
         if not found:
@@ -85,8 +83,7 @@ def create_app(storage_url, source_dir, template_dir):
 
     @app.route("/create_restaurant", methods=["POST"])
     def create_restaurant():
-        user_id = request.cookies.get(USER_ID_COOKIE)
-        user = database.get_user(user_id)
+        user = database.get_user(request.cookies.get(USER_ID_COOKIE))
 
         if user is None or not user.admin:
             return (render_template("404.html", path="???"), 404)
@@ -96,8 +93,7 @@ def create_app(storage_url, source_dir, template_dir):
 
     @app.route("/restaurant/<restaurant_id>/set_gm", methods=["POST"])
     def set_restaurant_gm(restaurant_id):
-        user_id = request.cookies.get(USER_ID_COOKIE)
-        user = database.get_user(user_id)
+        user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         gm_id = request.form["gm_id"]
         general_manager = database.get_user(gm_id)
         if user is None or not user.admin or general_manager is None:
@@ -107,30 +103,36 @@ def create_app(storage_url, source_dir, template_dir):
         database.flush()
         return redirect(f"/restaurant/{restaurant_id}")
 
+    @app.route("/restaurant/<restaurant_id>/add_role", methods=["POST"])
+    def add_restaurant_role(restaurant_id):
+        user = database.get_user(request.cookies.get(USER_ID_COOKIE))
+        restaurant = database.get_restaurant(restaurant_id)
+        name = request.form["name"]
+        required_field_empty = name is None or user is None or restaurant is None
+        if required_field_empty or restaurant.gm_id != user.id:
+            return (render_template("404.html", path="???"), 404)
+        database.create_role(restaurant_id, name)
+        return redirect(f"/restaurant/{restaurant_id}")
+
     @app.route("/welcome")
     def welcome():
-        user_id = request.cookies.get(USER_ID_COOKIE)
-        user = database.get_user(user_id)
+        user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         admin_user = user.admin if user is not None else False
         user_list = database.get_users() if admin_user else []
         restaurant_list = database.get_restaurants() if admin_user else []
-        print(
-            [
-                "user_id",
-                user_id,
-                "user",
-                user,
-                "admin_user",
-                admin_user,
-                "user_list",
-                user_list,
-            ]
+        user_restaurants_by_id = {}
+        for role in user.roles if user is not None else []:
+            user_restaurants_by_id[role.role.restaurant.id] = role.role.restaurant
+        sorted_roles = (
+            sorted(user.roles, key=lambda r: r.priority) if user.roles else []
         )
         return render_template(
             "welcome.html",
             user=user,
             user_list=user_list,
             restaurant_list=restaurant_list,
+            user_restaurants=list(user_restaurants_by_id.values()),
+            sorted_roles=sorted_roles,
         )
 
     @app.errorhandler(404)
