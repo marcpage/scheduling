@@ -61,7 +61,7 @@ def create_app(storage_url, source_dir, template_dir):
             return (render_template("404.html", path="???"), 404)
 
         created = database.create_restaurant(request.form["name"])
-        return redirect("/restaurant/%d"%(created.id))
+        return redirect(f"/restaurant/{created.id}")
 
     @app.route("/welcome")
     def welcome():

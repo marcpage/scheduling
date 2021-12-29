@@ -360,6 +360,7 @@ class Database:
         )
 
     def create_restaurant(self, name):
+        """doc string"""
         return self.__add(Restaurant(name=name))
 
     def get_restaurant(self, restaurant_id):
