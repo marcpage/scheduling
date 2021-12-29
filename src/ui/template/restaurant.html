@@ -7,7 +7,7 @@
         General Manager: {{ restaurant.gm }}
 
         <form action="/restaurant/{{ restaurant.id }}/set_gm" method="POST">
-            <select name="user">
+            <select name="gm_id">
                 {% for user in user_list %}
                     <option value="{{ user.id }}"{% if restaurant.gm and restaurant.gm.id == user.id%} selected{% endif %}>{{ user.name }} ({{ user.email }})</li>
                 {% endfor %}

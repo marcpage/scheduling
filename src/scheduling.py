@@ -14,6 +14,7 @@ STORAGE_PATH = os.path.join(
     os.environ["HOME"], "Library", "Preferences", "scheduling.sqlite3"
 )
 STORAGE = "sqlite:///" + STORAGE_PATH
+USER_ID_COOKIE = "session"
 
 
 def create_app(storage_url, source_dir, template_dir):
@@ -23,7 +24,7 @@ def create_app(storage_url, source_dir, template_dir):
 
     @app.route("/")
     def home():
-        user_id = request.cookies.get("user_id")
+        user_id = request.cookies.get(USER_ID_COOKIE)
         user = database.get_user(int(user_id)) if user_id is not None else user_id
         return render_template("index.html", user=user)
 
@@ -40,12 +41,12 @@ def create_app(storage_url, source_dir, template_dir):
             return redirect("/#user_not_found")
 
         response = make_response(redirect("/welcome"))
-        response.set_cookie("user_id", str(user.id), secure=True)
+        response.set_cookie(USER_ID_COOKIE, str(user.id), secure=False)
         return response
 
     @app.route("/restaurant/<restaurant_id>")
     def restaurant(restaurant_id):
-        user_id = request.cookies.get("user_id")
+        user_id = request.cookies.get(USER_ID_COOKIE)
         user = database.get_user(int(user_id)) if user_id is not None else user_id
         found = database.get_restaurant(restaurant_id)
 
@@ -61,7 +62,7 @@ def create_app(storage_url, source_dir, template_dir):
 
     @app.route("/create_restaurant", methods=["POST"])
     def create_restaurant():
-        user_id = request.cookies.get("user_id")
+        user_id = request.cookies.get(USER_ID_COOKIE)
         user = database.get_user(int(user_id)) if user_id is not None else user_id
 
         if user is None or not user.admin:
@@ -70,9 +71,22 @@ def create_app(storage_url, source_dir, template_dir):
         created = database.create_restaurant(request.form["name"])
         return redirect(f"/restaurant/{created.id}")
 
+    @app.route("/restaurant/<restaurant_id>/set_gm", methods=["POST"])
+    def set_restaurant_gm(restaurant_id):
+        user_id = request.cookies.get(USER_ID_COOKIE)
+        user = database.get_user(int(user_id)) if user_id is not None else user_id
+        gm_id = request.form["gm_id"]
+        general_manager = database.get_user(gm_id) if gm_id is not None else None
+        if user is None or not user.admin or general_manager is None:
+            return (render_template("404.html", path="???"), 404)
+        found = database.get_restaurant(restaurant_id)
+        found.gm = general_manager
+        database.flush()
+        return redirect(f"/restaurant/{restaurant_id}")
+
     @app.route("/welcome")
     def welcome():
-        user_id = request.cookies.get("user_id")
+        user_id = request.cookies.get(USER_ID_COOKIE)
         user = database.get_user(int(user_id)) if user_id is not None else user_id
         admin_user = user.admin if user is not None else False
         user_list = database.get_users() if admin_user else []
