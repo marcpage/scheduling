@@ -128,13 +128,18 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0915
         sorted_roles = (
             sorted(user.roles, key=lambda r: r.priority) if user.roles else []
         )
+        restaurants = list(user_restaurants_by_id.values())
+        for restaurant in restaurants:  # in case any new roles have been added
+            database.add_user_to_restaurant(user, restaurant)
+        database.flush()
         return render_template(
             "welcome.html",
             user=user,
             user_list=user_list,
             restaurant_list=restaurant_list,
-            user_restaurants=list(user_restaurants_by_id.values()),
+            user_restaurants=restaurants,
             sorted_roles=sorted_roles,
+            sessions=", ".join([f"{s:.1f}" for s in database.sessions()]),
         )
 
     @app.errorhandler(404)

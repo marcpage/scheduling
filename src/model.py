@@ -6,9 +6,43 @@
 import datetime
 import hashlib
 import threading
+import time
 
 import sqlalchemy
 import sqlalchemy.ext.declarative
+
+# TODO: SAWarning: relationship 'Restaurant.roles' will copy  # pylint: disable=W0511
+# column restaurant.id to column role.restaurant_id, which conflicts with relationship(s):
+# 'Role.restaurant' (copies restaurant.id to role.restaurant_id).
+# If this is not the intention, consider if these relationships should be linked with
+# back_populates, or if viewonly=True should be applied to one or more if they are
+# read-only. For the less common case that foreign key constraints are partially
+# overlapping, the orm.foreign() annotation can be used to isolate the columns that
+# should be written towards.   To silence this warning, add the
+# parameter 'overlaps="restaurant"' to the 'Restaurant.roles' relationship.
+# (Background on this error at: https://sqlalche.me/e/14/qzyx)
+
+# TODO: SAWarning: relationship 'User.gm_at' will copy  # pylint: disable=W0511
+# column user.id to column restaurant.gm_id, which conflicts with relationship(s):
+# 'Restaurant.gm' (copies user.id to restaurant.gm_id).
+# If this is not the intention, consider if these relationships should be linked with
+# back_populates, or if viewonly=True should be applied to one or more if they are
+# read-only. For the less common case that foreign key constraints are partially
+# overlapping, the orm.foreign() annotation can be used to isolate the columns that
+# should be written towards.   To silence this warning, add the
+# parameter 'overlaps="gm"' to the 'User.gm_at' relationship.
+# (Background on this error at: https://sqlalche.me/e/14/qzyx)
+
+# TODO: SAWarning: relationship 'User.roles' will copy  # pylint: disable=W0511
+# column user.id to column user_role_preference.user_id, which conflicts with relationship(s):
+# 'UserRolePreference.user' (copies user.id to user_role_preference.user_id).
+# If this is not the intention, consider if these relationships should be linked with
+# back_populates, or if viewonly=True should be applied to one or more if they are
+# read-only. For the less common case that foreign key constraints are partially
+# overlapping, the orm.foreign() annotation can be used to isolate the columns that
+# should be written towards.   To silence this warning, add the
+# parameter 'overlaps="user"' to the 'User.roles' relationship.
+# (Background on this error at: https://sqlalche.me/e/14/qzyx)
 
 
 # W0223: Method 'python_type' is abstract in class 'TypeEngine' but is not overridden
@@ -320,14 +354,24 @@ class Database:
 
         with self.__session_lock:
             if thread_id not in self.__sessions:
-                self.__sessions[thread_id] = self.__session_creator()
-
-        return self.__sessions[thread_id]
+                self.__sessions[thread_id] = {
+                    "session": self.__session_creator(),
+                    "access": time.time(),
+                }
+            else:
+                self.__sessions[thread_id]["access"] = time.time()
+        return self.__sessions[thread_id]["session"]
 
     def __add(self, entry):
         self.__session().add(entry)
         self.__session().commit()
         return entry
+
+    def sessions(self):
+        """Return the number of active sessions"""
+        now = time.time()
+        with self.__session_lock:
+            return [now - s["access"] for s in self.__sessions.values()]
 
     def flush(self):
         """flush all changes to the database"""
@@ -341,14 +385,18 @@ class Database:
     def create_user(self, email, password, name, **kwargs):
         """doc string"""
         found = self.find_user(email)
-        return self.__add(
-            User(
-                email=email,
-                password_hash=User.hash_password(password),
-                name=name,
-                **kwargs,
+        return (
+            self.__add(
+                User(
+                    email=email,
+                    password_hash=User.hash_password(password),
+                    name=name,
+                    **kwargs,
+                )
             )
-        ) if found is None else found
+            if found is None
+            else found
+        )
 
     def get_user(self, user_id):
         """doc string"""
@@ -360,16 +408,19 @@ class Database:
 
     def add_user_to_restaurant(self, user, restaurant):
         """doc string"""
-        priority = 1.0
+        priority = 1.0 + (max([r.priority for r in user.roles]) if user.roles else 0.0)
+        preferred_roles = [r.id for r in user.roles]
+
         for role in restaurant.roles:
-            self.__add(
-                UserRolePreference(
-                    user_id=user.id,
-                    role_id=role.id,
-                    priority=priority,
+            if role.id not in preferred_roles:
+                self.__add(
+                    UserRolePreference(
+                        user_id=user.id,
+                        role_id=role.id,
+                        priority=priority,
+                    )
                 )
-            )
-            priority += 1.0
+                priority += 1.0
 
     def find_user(self, email):
         """doc string"""

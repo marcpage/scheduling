@@ -1,6 +1,9 @@
 # macOS hidden files
 .DS_Store
 
+# temporary files
+bin/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
