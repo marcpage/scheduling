@@ -105,10 +105,10 @@ Any changes you make to this branch after this point will just need `git commit 
 
 If there have been changes added to the `main` branch since your branch was created, you will need to merge those changes back into your branch.
 
-`git checkout main`
-`git pull`
-`git checkout my_name/meaningful_change_name`
-`git merge main`
+`git checkout main` \
+`git pull` \
+`git checkout my_name/meaningful_change_name` \
+`git merge main` 
 
 If there were any changes in `main` that conflicted with your changes, they will be marked with HEAD and will show both changes in the same file.
 Search through your files for HEAD.
@@ -136,7 +136,7 @@ You will need to click two green buttons, one to start and one to confirm the co
 
 After the pull request is complete, `main` now has newer source than you have on your machine.
 
-`git checkout main`
+`git checkout main` \
 `git pull`
 
 You can now go back to the `modify source` step above.
