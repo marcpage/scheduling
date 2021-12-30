@@ -73,10 +73,12 @@ class RoleValue(Alchemy_Base):  # pylint: disable=R0903
 
     __tablename__ = "role_value"
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
-    gm_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"))
-    gm = sqlalchemy.orm.relationship("User", foreign_keys=[gm_id])
+    restaurant_id = sqlalchemy.Column(
+        sqlalchemy.Integer, sqlalchemy.ForeignKey("restaurant.id")
+    )
+    restaurant = sqlalchemy.orm.relationship("Restaurant")
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"))
-    user = sqlalchemy.orm.relationship("User", foreign_keys=[user_id])
+    user = sqlalchemy.orm.relationship("User")
     role_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("role.id"))
     role = sqlalchemy.orm.relationship("Role")
     priority = sqlalchemy.Column(sqlalchemy.Float)
@@ -177,10 +179,12 @@ class UserLimits(Alchemy_Base):  # pylint: disable=R0903
 
     __tablename__ = "user_limits"
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
-    gm_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"))
-    gm = sqlalchemy.orm.relationship("User", foreign_keys=[gm_id])
+    restaurant_id = sqlalchemy.Column(
+        sqlalchemy.Integer, sqlalchemy.ForeignKey("restaurant.id")
+    )
+    restaurant = sqlalchemy.orm.relationship("Restaurant")
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"))
-    user = sqlalchemy.orm.relationship("User", foreign_keys=[user_id])
+    user = sqlalchemy.orm.relationship("User")
     hours_limit = sqlalchemy.Column(sqlalchemy.Integer)
     notes = sqlalchemy.Column(sqlalchemy.String(50))
 
@@ -437,7 +441,11 @@ class Database:
 
     def create_role(self, restaurant_id, name):
         """doc string"""
-        return self.__add(Role(name=name, restaurant_id=restaurant_id))
+        return (
+            self.__add(Role(name=name, restaurant_id=restaurant_id))
+            if len(name) > 0
+            else None
+        )
 
     def create_restaurant(self, name):
         """doc string"""
