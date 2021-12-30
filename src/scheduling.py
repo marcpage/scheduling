@@ -218,7 +218,7 @@ def parse_args():
     return args
 
 
-def main():
+def main(a,b,c,d,e,f,g,h,i,j):
     """Entry point. Loop forever unless we are told not to."""
 
     args = parse_args()
