@@ -1,5 +1,24 @@
+
+
 # Staff Scheduling
 Restaurant staff scheduling website
+
+* [How to work in the codebase](#how-to-work-in-the-codebase)
+  * [Get the latest source](#get-the-latest-source)
+  * [Modify the source](#modify-the-source)
+    * [Interface](#interface)
+    * [Logic](#logic)
+    * [Data Model](#data-model)
+  * [Check your changes](#check-your-changes)
+  * [Run the code](#run-the-code)
+  * [Submit the code](#submit-the-code)
+    * [Create a new source branch](#create-a-new-source-branch)
+    * [Review your changes](#review-your-changes)
+    * [Commit your changes](#commit-your-changes)
+    * [Push your changes](#push-your-changes)
+    * [Merge changes from main branch](#merge-changes-from-main-branch)
+  * [Create a Pull Request](#create-a-pull-request)
+  * [Get ready for the next change](#get-ready-for-the-next-change)
 
 # How to work in the codebase
 
