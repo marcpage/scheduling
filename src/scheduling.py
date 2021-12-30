@@ -36,16 +36,17 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         response.set_cookie(USER_ID_COOKIE, "", expires=0)
         return response
 
-    @app.route("/login", methods=["POST"])
+    @app.route("/login", methods=["POST"])  # using POST method for user login
     def login():
-        email = request.form["email"]
+        email = request.form["email"]  # Request module is used to fetch users "email" and "password"
         password = request.form["password"]
         user = database.find_user(email)
-        if user is None and email.lower() == "marcallenpage@gmail.com":
+        if user is None and email.lower() == "marcallenpage@gmail.com":  # Checking whether the user exits in the
+            # database
             user = database.create_user(
                 email, password, "Marc", hours_limit=0.0, admin=True
             )
-        elif user is None:
+        elif user is None:  # Redirects the user if not found in the database
             return redirect("/#user_not_found")
 
         response = make_response(redirect("/welcome"))
@@ -53,7 +54,7 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         return response
 
     @app.route("/create_user", methods=["POST"])
-    def create_user():
+    def create_user():  # Creates user
         name = request.form["name"]
         email = request.form["email"]
         password = request.form["password"]
@@ -62,18 +63,18 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         )
         restaurant = database.get_restaurant(request.form["restaurant_id"])
         if restaurant is not None:
-            database.add_user_to_restaurant(user, restaurant)
-        if not user.password_matches(password):
+            database.add_user_to_restaurant(user, restaurant)  # adds user to data restaurant
+        if not user.password_matches(password):  # Redirects if password don't match
             return redirect("/#user_account_already_exists")
         response = make_response(redirect("/welcome"))
         response.set_cookie(USER_ID_COOKIE, str(user.id), secure=False)
         return response
 
     @app.route("/set_role_priority", methods=["POST"])
-    def set_role_priority():
+    def set_role_priority():  # Sets role priority
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         if user is None:
-            return (render_template("404.html", path="???"), 404)
+            return (render_template("404.html", path="???"), 404)  # returns Error 404 Page if user not found in db
         for role in user.roles:
             new_priority = request.form[f"{role.id}_priority"]
             if new_priority is not None:
@@ -82,11 +83,11 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         return redirect("/welcome")
 
     @app.route("/restaurant/<restaurant_id>")
-    def restaurant(restaurant_id):
+    def restaurant(restaurant_id):  # Fetches user from database
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         found = database.get_restaurant(restaurant_id)
 
-        if not found:
+        if not found:  # If user not found returns Error 404 Page
             return (render_template("404.html", path="???"), 404)
 
         admin_user = user.admin if user is not None else False
@@ -96,7 +97,7 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
             "restaurant.html", restaurant=found, user=user, user_list=user_list
         )
 
-    @app.route("/create_restaurant", methods=["POST"])
+    @app.route("/create_restaurant", methods=["POST"])  # Creates restaurant
     def create_restaurant():
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
 
@@ -119,7 +120,7 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         return redirect(f"/restaurant/{restaurant_id}")
 
     @app.route("/restaurant/<restaurant_id>/add_role", methods=["POST"])
-    def add_restaurant_role(restaurant_id):
+    def add_restaurant_role(restaurant_id):  # adds restaurant role
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         restaurant = database.get_restaurant(restaurant_id)
         name = request.form["name"]
@@ -156,7 +157,7 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         )
 
     @app.errorhandler(404)
-    def page_not_found(error):
+    def page_not_found(error):  # returns page not found error
         print(error)
         return (render_template("404.html", path="???"), 404)
 
