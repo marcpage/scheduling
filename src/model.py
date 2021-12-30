@@ -67,30 +67,6 @@ class Date(sqlalchemy.types.TypeDecorator):  # pylint: disable=W0223
 Alchemy_Base = sqlalchemy.ext.declarative.declarative_base()
 
 
-# R0903: Too few public methods (0/2) (too-few-public-methods)
-class RoleValue(Alchemy_Base):  # pylint: disable=R0903
-    """the value of a user for the role for the gm"""
-
-    __tablename__ = "role_value"
-    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
-    restaurant_id = sqlalchemy.Column(
-        sqlalchemy.Integer, sqlalchemy.ForeignKey("restaurant.id")
-    )
-    restaurant = sqlalchemy.orm.relationship("Restaurant")
-    user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"))
-    user = sqlalchemy.orm.relationship("User")
-    role_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("role.id"))
-    role = sqlalchemy.orm.relationship("Role")
-    priority = sqlalchemy.Column(sqlalchemy.Float)
-
-    def __repr__(self):
-        """display string"""
-        return (
-            f'id = {self.id} gm = "{self.gm.name}" user = "{self.user.name}" '
-            + f"role = {self.role.name} priority = {self.priority}"
-        )
-
-
 default_shift_roles = sqlalchemy.Table(
     "default_shift_roles",
     Alchemy_Base.metadata,
@@ -117,10 +93,10 @@ class DefaultShift(Alchemy_Base):  # pylint: disable=R0903
         """display string"""
         roles = ", ".join([r.name for r in self.roles])
         return (
-            f'id = {self.id} day = "{self.day_of_week}" start time = "{self.start_time}" '
-            + f"end time = {self.end_time} priority = {self.priority} "
-            + f"start date = {self.start_date} end date = {self.end_date} "
-            + f'roles = "{roles}"'
+            f'DefaultShift(id={self.id} day="{self.day_of_week}" start time="{self.start_time}" '
+            + f"end time={self.end_time} priority={self.priority} "
+            + f"start date={self.start_date} end date={self.end_date} "
+            + f'roles="{roles}")'
         )
 
 
@@ -148,8 +124,8 @@ class Shift(Alchemy_Base):  # pylint: disable=R0903
     def __repr__(self):
         """display string"""
         return (
-            f'id = {self.id} date = "{self.date}" start time = "{self.start_time}" '
-            + f'end time = {self.end_time} priority = {self.priority} note="{self.note}"'
+            f'Shift(id={self.id} date="{self.date}" start time="{self.start_time}" '
+            + f'end time={self.end_time} priority={self.priority} note="{self.note}")'
         )
 
 
@@ -164,12 +140,14 @@ class UserRolePreference(Alchemy_Base):  # pylint: disable=R0903
     role_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("role.id"))
     role = sqlalchemy.orm.relationship("Role")
     priority = sqlalchemy.Column(sqlalchemy.Float)
+    gm_priority = sqlalchemy.Column(sqlalchemy.Float)
 
     def __repr__(self):
         """display string"""
         return (
-            f'id = {self.id} user = "{self.user.name}" role = "{self.role.name}" '
-            + f"priority = {self.priority}"
+            f'UserRolePreference(id={self.id} user="{self.user.name}" '
+            f'role="{self.role.name}" @ "{self.role.restaurant.name}" '
+            + f"priority={self.priority})"
         )
 
 
@@ -191,8 +169,8 @@ class UserLimits(Alchemy_Base):  # pylint: disable=R0903
     def __repr__(self):
         """display string"""
         return (
-            f'id = {self.id} gm = "{self.gm.name}" user = "{self.user.name}" '
-            + f"hours = {self.hours_limit} notes = {self.notes}"
+            f'UserLimits(id={self.id} gm="{self.gm.name}" user="{self.user.name}" '
+            + f"hours={self.hours_limit} notes={self.notes})"
         )
 
 
@@ -214,8 +192,8 @@ class ScheduledShift(Alchemy_Base):  # pylint: disable=R0903
     def __repr__(self):
         """display string"""
         return (
-            f'id = {self.id} date = "{self.date}" shift = "{self.shift}" role = {self.role.name}'
-            + f"user = {self.user.name} draft = {self.draft}"
+            f'ScheduledShift(id={self.id} date="{self.date}" shift="{self.shift}" '
+            + f"role={self.role.name} user={self.user.name} draft={self.draft})"
         )
 
 
@@ -240,9 +218,10 @@ class UserShiftDefaultRequest(Alchemy_Base):  # pylint: disable=R0903
     def __repr__(self):
         """display string"""
         return (
-            f'id = {self.id} user="{self.user.name}" restaurant="{self.restaurant.name}" '
-            + f"day = {self.day_of_week} start_time = {self.start_time} end_time = {self.end_time} "
-            + f'priority = {self.priority} note = "{self.note}"'
+            f'UserShiftDefaultRequest(id={self.id} user="{self.user.name}" '
+            + f'restaurant="{self.restaurant.name}" day={self.day_of_week} '
+            + f"start_time={self.start_time} end_time={self.end_time} "
+            + f'priority={self.priority} note="{self.note}")'
         )
 
 
@@ -267,9 +246,10 @@ class UserShfitRequest(Alchemy_Base):  # pylint: disable=R0903
     def __repr__(self):
         """display string"""
         return (
-            f'id = {self.id} user="{self.user.name}" restaurant="{self.restaurant.name}" '
-            + f"date = {self.date} start_time = {self.start_time} end_time = {self.end_time} "
-            + f'priority = {self.priority} note = "{self.note}"'
+            f'UserShfitRequest(id={self.id} user="{self.user.name}" '
+            + f'restaurant="{self.restaurant.name}" '
+            + f"date={self.date} start_time={self.start_time} end_time={self.end_time} "
+            + f'priority={self.priority} note="{self.note}")'
         )
 
 
@@ -284,6 +264,14 @@ class Role(Alchemy_Base):  # pylint: disable=R0903
         sqlalchemy.Integer, sqlalchemy.ForeignKey("restaurant.id")
     )
     restaurant = sqlalchemy.orm.relationship("Restaurant")
+    preferences = sqlalchemy.orm.relationship("UserRolePreference")
+
+    def __repr__(self):
+        """display string"""
+        return (
+            f'Role(id={self.id} name="{self.name}" '
+            f'restaurant="{self.restaurant.name}")'
+        )
 
 
 # R0903: Too few public methods (0/2) (too-few-public-methods)
@@ -299,7 +287,7 @@ class Restaurant(Alchemy_Base):  # pylint: disable=R0903
 
     def __repr__(self):
         """display string"""
-        return f'id = {self.id} name="{self.name}" gm="{self.gm.name}"'
+        return f'Restaurant(id={self.id} name="{self.name}" gm="{self.gm.name}")'
 
 
 # R0903: Too few public methods (0/2) (too-few-public-methods)
@@ -337,7 +325,7 @@ class User(Alchemy_Base):  # pylint: disable=R0903
 
     def __repr__(self):
         """display string"""
-        return f'id = {self.id} name="{self.name}" email="{self.email}"'
+        return f'User(id={self.id} name="{self.name}" email="{self.email}")'
 
 
 class Database:
@@ -386,6 +374,8 @@ class Database:
         self.__session().commit()
         self.__session().close()
 
+    # Mark: User API
+
     def create_user(self, email, password, name, **kwargs):
         """doc string"""
         found = self.find_user(email)
@@ -422,6 +412,7 @@ class Database:
                         user_id=user.id,
                         role_id=role.id,
                         priority=priority,
+                        gm_priority=priority,
                     )
                 )
                 priority += 1.0
@@ -439,6 +430,8 @@ class Database:
         """doc string"""
         return self.__session().query(User).all()
 
+    # Mark: Role API
+
     def create_role(self, restaurant_id, name):
         """doc string"""
         return (
@@ -446,6 +439,8 @@ class Database:
             if len(name) > 0
             else None
         )
+
+    # Mark: Restaurant API
 
     def create_restaurant(self, name):
         """doc string"""
