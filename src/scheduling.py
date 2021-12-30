@@ -19,7 +19,8 @@ USER_ID_COOKIE = "session"
 
 
 # R0915: Too many statements (51/50) (too-many-statements)
-def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0915
+# R0914: Too many local variables (16/15) (too-many-locals)
+def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,R0915
     """create the flask app"""
     app = Flask(__name__, static_folder=source_dir, template_folder=template_dir)
     database = model.Database(storage_url)
@@ -67,6 +68,18 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0915
         response = make_response(redirect("/welcome"))
         response.set_cookie(USER_ID_COOKIE, str(user.id), secure=False)
         return response
+
+    @app.route("/set_role_priority", methods=["POST"])
+    def set_role_priority():
+        user = database.get_user(request.cookies.get(USER_ID_COOKIE))
+        if user is None:
+            return (render_template("404.html", path="???"), 404)
+        for role in user.roles:
+            new_priority = request.form[f"{role.id}_priority"]
+            if new_priority is not None:
+                role.priority = float(new_priority)
+        database.flush()
+        return redirect("/welcome")
 
     @app.route("/restaurant/<restaurant_id>")
     def restaurant(restaurant_id):
