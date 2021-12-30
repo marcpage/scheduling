@@ -25,10 +25,14 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
     app = Flask(__name__, static_folder=source_dir, template_folder=template_dir)
     database = model.Database(storage_url)
 
+    # Mark: Root
+
     @app.route("/")
     def home():
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         return render_template("index.html", user=user)
+
+    # Mark: Generic Actions
 
     @app.route("/logout")
     def logout():
@@ -51,6 +55,8 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         response = make_response(redirect("/welcome"))
         response.set_cookie(USER_ID_COOKIE, str(user.id), secure=False)
         return response
+
+    # Mark: User Actions
 
     @app.route("/create_user", methods=["POST"])
     def create_user():
@@ -79,22 +85,17 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
             if new_priority is not None:
                 role.priority = float(new_priority)
         database.flush()
-        return redirect("/welcome")
+        restaurant = database.get_restaurant(request.form["restaurant_id"])
+        if restaurant is None:
+            return redirect("/welcome")
 
-    @app.route("/restaurant/<restaurant_id>")
-    def restaurant(restaurant_id):
-        user = database.get_user(request.cookies.get(USER_ID_COOKIE))
-        found = database.get_restaurant(restaurant_id)
+        for role in [p for r in restaurant.roles for p in r.preferences]:
+            new_gm_priority = request.form[f"{role.id}_gm_priority"]
+            if new_gm_priority is not None:
+                role.gm_priority = float(new_gm_priority)
+        return redirect(f"/restaurant/{restaurant.id}")
 
-        if not found:
-            return (render_template("404.html", path="???"), 404)
-
-        admin_user = user.admin if user is not None else False
-        user_list = database.get_users() if admin_user else []
-
-        return render_template(
-            "restaurant.html", restaurant=found, user=user, user_list=user_list
-        )
+    # Mark: Restaurant Actions
 
     @app.route("/create_restaurant", methods=["POST"])
     def create_restaurant():
@@ -129,6 +130,8 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         database.create_role(restaurant_id, name)
         return redirect(f"/restaurant/{restaurant_id}")
 
+    # Mark: Actual websites
+
     @app.route("/welcome")
     def welcome():
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
@@ -153,6 +156,31 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
             user_restaurants=restaurants,
             sorted_roles=sorted_roles,
             sessions=", ".join([f"{s:.1f}" for s in database.sessions()]),
+        )
+
+    @app.route("/restaurant/<restaurant_id>")
+    def restaurant(restaurant_id):
+        user = database.get_user(request.cookies.get(USER_ID_COOKIE))
+        found = database.get_restaurant(restaurant_id)
+
+        if not found:
+            return (render_template("404.html", path="???"), 404)
+
+        admin_user = user.admin if user is not None else False
+        user_list = database.get_users() if admin_user else []
+        gm_user_roles = [p for r in found.roles for p in r.preferences]
+        gm_user_roles.sort(key=lambda r: r.gm_priority)
+        user_restaurant_roles = [
+            r for r in user.roles if r.role.restaurant_id == int(restaurant_id)
+        ]
+        user_restaurant_roles.sort(key=lambda r: r.priority)
+        return render_template(
+            "restaurant.html",
+            restaurant=found,
+            user=user,
+            user_list=user_list,
+            user_roles=gm_user_roles,
+            user_restaurant_roles=user_restaurant_roles,
         )
 
     @app.errorhandler(404)

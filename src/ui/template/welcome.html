@@ -42,31 +42,5 @@
     {% endfor %}
     </ul>
 
-    {% if sorted_roles %}
-    <form action="/set_role_priority" method="POST">
-        <ul>
-        {% for restaurant in user_restaurants %}
-            <li><a href="/restaurant/{{ restaurant.id }}">{{ restaurant.name }}</a></li>
-            <ul>
-                {% for role in sorted_roles %}
-                    {% if role.role.restaurant_id == restaurant.id %}
-                        <li>
-                            {{ role.role.name }}
-                            <input type="number"
-                                name="{{ role.id }}_priority"
-                                value="{{ role.priority }}"
-                                min=1
-                                max=100
-                                step=1/>
-                        </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-        {% endfor %}
-        </ul>
-        <input type="submit" value="change role priority"/>
-    </form>
-    {% endif %}
-
 </body>
 </html>
