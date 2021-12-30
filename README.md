@@ -146,6 +146,6 @@ After the pull request is complete, `main` now has newer source than you have on
 `git checkout main` \
 `git pull`
 
-You can now go back to the `modify source` step above.
+You can now go back to the [Modify the source](#modify-the-source) step above.
 
 
