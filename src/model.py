@@ -299,7 +299,10 @@ class Restaurant(Alchemy_Base):  # pylint: disable=R0903
 
     def __repr__(self):
         """display string"""
-        return f'Restaurant(id={self.id} name="{self.name}" gm="{self.gm.name}")'
+        return (
+            f'Restaurant(id={self.id} name="{self.name}" '
+            + f'gm="{self.gm.name if self.gm else None}")'
+        )
 
 
 # R0903: Too few public methods (0/2) (too-few-public-methods)
@@ -323,10 +326,6 @@ class User(Alchemy_Base):  # pylint: disable=R0903
     admin = sqlalchemy.Column(sqlalchemy.Boolean)
     gm_at = sqlalchemy.orm.relationship("Restaurant")
     roles = sqlalchemy.orm.relationship("UserRolePreference")
-    # m = schedule manager, a = admin, g = general manager, s = shift worker
-    # roles = sqlalchemy.Column(sqlalchemy.String(4))
-    # last_login = sqlalchemy.Column(sqlalchemy.DateTime)
-    # rank = sqlalchemy.Column(sqlalchemy.Float)
 
     @staticmethod
     def hash_password(text):
