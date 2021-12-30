@@ -125,7 +125,7 @@ This allows review of the code to get another set of eyes on it.
 
 Go to https://github.com/marcpage/scheduling/pulls
 
-There should be a green button that says create a pull request.
+There should be a green button that says `Compare and Pull Request`.
 After the pull request is created, respond to comments, fix anything needed. 
 Changes can be made, and then you can `commit` and `push` (see above) to update your branch.
 
