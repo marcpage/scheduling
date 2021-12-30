@@ -125,7 +125,7 @@ This allows review of the code to get another set of eyes on it.
 
 Go to https://github.com/marcpage/scheduling/pulls
 
-There should be a green button that says `Compare and Pull Request`.
+There should be a green button that says `Compare & Pull Request`.
 
 <img width="553" alt="Screen Shot 2021-12-30 at 11 42 43 AM" src="https://user-images.githubusercontent.com/695749/147775951-2554acf3-cbb6-480f-ba6e-d46ec23f0985.png">
 
