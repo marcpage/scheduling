@@ -126,11 +126,18 @@ This allows review of the code to get another set of eyes on it.
 Go to https://github.com/marcpage/scheduling/pulls
 
 There should be a green button that says `Compare and Pull Request`.
+
+<img width="553" alt="Screen Shot 2021-12-30 at 11 42 43 AM" src="https://user-images.githubusercontent.com/695749/147775951-2554acf3-cbb6-480f-ba6e-d46ec23f0985.png">
+
 After the pull request is created, respond to comments, fix anything needed. 
 Changes can be made, and then you can `commit` and `push` (see above) to update your branch.
+Once everything is good, you can complete the pull request (green `Squash and merge` button near the bottom).
 
-Once everything is good, you can complete the pull request (green button near the bottom).
-You will need to click two green buttons, one to start and one to confirm the completion.
+<img width="553" alt="Screen Shot 2021-12-30 at 11 45 48 AM" src="https://user-images.githubusercontent.com/695749/147775964-eb40d818-8ce0-4cb8-b31f-2191726616e8.png">
+
+The confirm the completion by pressing the green `Confirm squash and merge` button.
+
+<img width="562" alt="Screen Shot 2021-12-30 at 11 45 55 AM" src="https://user-images.githubusercontent.com/695749/147775991-a890c1aa-8d2f-4243-8663-97e514f5f8b1.png">
 
 ## Get ready for the next change
 
