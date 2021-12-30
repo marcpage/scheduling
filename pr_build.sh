@@ -15,8 +15,12 @@ pip3 install -qr Requirements.txt
 
 if [ "$1" = "" ]; then export CHECK=--check; fi
 
-black $CHECK src/*.py
-pylint src/*.py
-flake8 --max-line-length=100 src/*.py
+export SOURCES="src/*.py"
+
+black $CHECK $SOURCES
+pylint $SOURCES
+flake8 --max-line-length=100 $SOURCES
+
+python3 -m unittest discover -s src/tests -t src
 
 if [ "$1" = "run" ]; then python3 src/scheduling.py; fi

@@ -10,6 +10,7 @@ from flask import Flask, render_template, request, redirect, make_response
 
 import model
 
+# TODO: template # pylint: disable=W0511
 STORAGE_PATH = os.path.join(
     os.environ["HOME"], "Library", "Preferences", "scheduling.sqlite3"
 )
@@ -52,7 +53,6 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0915
 
     @app.route("/create_user", methods=["POST"])
     def create_user():
-        # TODO: make sure the email is unique # pylint: disable=W0511
         name = request.form["name"]
         email = request.form["email"]
         password = request.form["password"]
@@ -62,6 +62,8 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0915
         restaurant = database.get_restaurant(request.form["restaurant_id"])
         if restaurant is not None:
             database.add_user_to_restaurant(user, restaurant)
+        if not user.password_matches(password):
+            return redirect("/#user_account_already_exists")
         response = make_response(redirect("/welcome"))
         response.set_cookie(USER_ID_COOKIE, str(user.id), secure=False)
         return response
@@ -126,13 +128,18 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0915
         sorted_roles = (
             sorted(user.roles, key=lambda r: r.priority) if user.roles else []
         )
+        restaurants = list(user_restaurants_by_id.values())
+        for restaurant in restaurants:  # in case any new roles have been added
+            database.add_user_to_restaurant(user, restaurant)
+        database.flush()
         return render_template(
             "welcome.html",
             user=user,
             user_list=user_list,
             restaurant_list=restaurant_list,
-            user_restaurants=list(user_restaurants_by_id.values()),
+            user_restaurants=restaurants,
             sorted_roles=sorted_roles,
+            sessions=", ".join([f"{s:.1f}" for s in database.sessions()]),
         )
 
     @app.errorhandler(404)
