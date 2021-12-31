@@ -11,8 +11,9 @@ from flask import Flask, render_template, request, redirect, make_response
 import model
 
 # TODO: template # pylint: disable=W0511
-STORAGE_PATH = os.path.join(os.environ["HOME"],
-                            "Library", "Preferences", "scheduling.sqlite3")
+STORAGE_PATH = os.path.join(
+    os.environ["HOME"], "Library", "Preferences", "scheduling.sqlite3"
+)
 STORAGE = "sqlite:///" + STORAGE_PATH
 USER_ID_COOKIE = "session"
 
@@ -54,7 +55,7 @@ def create_app(storage_url, source_dir, template_dir):
                 email, password, "Admin", hours_limit=0.0, admin=True
             )
         elif user is None:
-            """Redirects the user if not found in the database"""
+            # Redirects the user if not found in the database
             return redirect("/#user_not_found")
 
         response = make_response(redirect("/welcome"))
@@ -62,11 +63,10 @@ def create_app(storage_url, source_dir, template_dir):
         return response
 
     # Mark: User Actions
-    """Creates Employee in the database using 'POST method' """
 
     @app.route("/create_user", methods=["POST"])
     def create_user():
-        """ " Creates Employee"""
+        """Creates Employee"""
         name = request.form["name"]
         email = request.form["email"]
         password = request.form["password"]
@@ -86,7 +86,7 @@ def create_app(storage_url, source_dir, template_dir):
 
     @app.route("/set_role_priority", methods=["POST"])
     def set_role_priority():
-        """Route to set_role_priority using 'POST' """
+        """Route to set_role_priority using 'POST'"""
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         if user is None:
             return (render_template("404.html", path="???"), 404)
@@ -97,35 +97,15 @@ def create_app(storage_url, source_dir, template_dir):
         database.flush()
         return redirect("/welcome")
 
-    @app.route("/restaurant/<restaurant_id>")
-    def restaurant(restaurant_id):
-        """Fetches Employee data from database using 'USER_ID_COOKIE'"""
-        user = database.get_user(request.cookies.get(USER_ID_COOKIE))
-        found = database.get_restaurant(restaurant_id)
-
-        if not found:
-            return (render_template("404.html", path="???"), 404)
-        restaurant = database.get_restaurant(request.form["restaurant_id"])
-        if restaurant is None:
-            return redirect("/welcome")
-
-        for role in [p for r in restaurant.roles for p in r.preferences]:
-            new_gm_priority = request.form[f"{role.id}_gm_priority"]
-            if new_gm_priority is not None:
-                role.gm_priority = float(new_gm_priority)
-        return redirect(f"/restaurant/{restaurant.id}")
-
     # Mark: Restaurant Actions
-
-    """Creates restaurant"""
 
     @app.route("/create_restaurant", methods=["POST"])
     def create_restaurant():
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
 
         if user is None or not user.admin:
-            """If user is not both EMPLOYEE OR ADMIN 
-                then return Error 404 Page"""
+            # If user is not both EMPLOYEE OR ADMIN
+            # then return Error 404 Page
             return (render_template("404.html", path="???"), 404)
 
         created = database.create_restaurant(request.form["name"])
@@ -149,8 +129,9 @@ def create_app(storage_url, source_dir, template_dir):
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         restaurant = database.get_restaurant(restaurant_id)
         name = request.form["name"]
-        required_field_empty = name is None or user is None or restaurant is None
-        if required_field_empty or restaurant.gm_id != user.id:
+        r_f_e = name is None or user is None or restaurant is None
+        # r_f_e stands for required_field_empty
+        if r_f_e or restaurant.gm_id != user.id:
             return (render_template("404.html", path="???"), 404)
         database.create_role(restaurant_id, name)
         return redirect(f"/restaurant/{restaurant_id}")
@@ -171,7 +152,7 @@ def create_app(storage_url, source_dir, template_dir):
             restaurant_list = list({p.role.restaurant for p in user.roles})
         user_restaurants_by_id = {}
         for role in user.roles if user is not None else []:
-            user_restaurants_by_id[role.role.restaurant.id] = role.role.restaurant
+            [role.role.restaurant.id] = role.role.restaurant
         sorted_roles = (
             sorted(user.roles, key=lambda r: r.priority) if user.roles else []
         )
@@ -204,8 +185,7 @@ def create_app(storage_url, source_dir, template_dir):
         gm_user_roles.sort(key=lambda r: r.gm_priority)
         user_restaurant_roles = (
             [r for r in user.roles
-                if r.role.restaurant_id == int(restaurant_id)
-            ]
+                if r.role.restaurant_id == int(restaurant_id)]
             if user is not None
             else []
         )
@@ -250,8 +230,8 @@ def parse_args():
         default="ui",
         help="Path to the directory with ui files.",
     )
-    parser.add_argument("-d", "--debug", default=True,
-                        help="Run debug server.")
+    parser.add_argument("-d", "--debug",
+                        default=True, help="Run debug server.")
     args = parser.parse_args()
 
     return args
