@@ -65,7 +65,7 @@ class TestUser(unittest.TestCase):
         database = open_db(sys._getframe().f_code.co_name)
         u1 = database.create_user(**USERS[0])
         u2 = database.create_user(
-            "U@c.com", "setec", "John", hours_limit=20.0, admin=True
+            "Ua@c.com", "setec", "John", hours_limit=20.0, admin=True
         )
         self.assertEqual(u1.id, u2.id)
 
