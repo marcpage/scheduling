@@ -45,9 +45,9 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         email = request.form["email"]
         password = request.form["password"]
         user = database.find_user(email)
-        if user is None and email.lower() == "marcallenpage@gmail.com":
+        if user is None and not database.get_users():
             user = database.create_user(
-                email, password, "Marc", hours_limit=0.0, admin=True
+                email, password, "Admin", hours_limit=0.0, admin=True
             )
         elif user is None:
             return redirect("/#user_not_found")
