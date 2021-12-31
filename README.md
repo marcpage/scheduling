@@ -20,6 +20,7 @@ Wouldn't it be great as an employee if you had to have someone cover you you cou
     * [Data Model](#data-model)
   * [Check your changes](#check-your-changes)
   * [Run the code](#run-the-code)
+    * [Boot-strap process](#boot-strap-process)
   * [Submit the code](#submit-the-code)
     * [Create a new source branch](#create-a-new-source-branch)
     * [Review your changes](#review-your-changes)
