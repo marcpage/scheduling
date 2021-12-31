@@ -11,39 +11,6 @@ import time
 import sqlalchemy
 import sqlalchemy.ext.declarative
 
-# TODO: SAWarning: relationship 'Restaurant.roles' will copy  # pylint: disable=W0511
-# column restaurant.id to column role.restaurant_id, which conflicts with relationship(s):
-# 'Role.restaurant' (copies restaurant.id to role.restaurant_id).
-# If this is not the intention, consider if these relationships should be linked with
-# back_populates, or if viewonly=True should be applied to one or more if they are
-# read-only. For the less common case that foreign key constraints are partially
-# overlapping, the orm.foreign() annotation can be used to isolate the columns that
-# should be written towards.   To silence this warning, add the
-# parameter 'overlaps="restaurant"' to the 'Restaurant.roles' relationship.
-# (Background on this error at: https://sqlalche.me/e/14/qzyx)
-
-# TODO: SAWarning: relationship 'User.gm_at' will copy  # pylint: disable=W0511
-# column user.id to column restaurant.gm_id, which conflicts with relationship(s):
-# 'Restaurant.gm' (copies user.id to restaurant.gm_id).
-# If this is not the intention, consider if these relationships should be linked with
-# back_populates, or if viewonly=True should be applied to one or more if they are
-# read-only. For the less common case that foreign key constraints are partially
-# overlapping, the orm.foreign() annotation can be used to isolate the columns that
-# should be written towards.   To silence this warning, add the
-# parameter 'overlaps="gm"' to the 'User.gm_at' relationship.
-# (Background on this error at: https://sqlalche.me/e/14/qzyx)
-
-# TODO: SAWarning: relationship 'User.roles' will copy  # pylint: disable=W0511
-# column user.id to column user_role_preference.user_id, which conflicts with relationship(s):
-# 'UserRolePreference.user' (copies user.id to user_role_preference.user_id).
-# If this is not the intention, consider if these relationships should be linked with
-# back_populates, or if viewonly=True should be applied to one or more if they are
-# read-only. For the less common case that foreign key constraints are partially
-# overlapping, the orm.foreign() annotation can be used to isolate the columns that
-# should be written towards.   To silence this warning, add the
-# parameter 'overlaps="user"' to the 'User.roles' relationship.
-# (Background on this error at: https://sqlalche.me/e/14/qzyx)
-
 
 # W0223: Method 'python_type' is abstract in class 'TypeEngine' but is not overridden
 class Date(sqlalchemy.types.TypeDecorator):  # pylint: disable=W0223
@@ -110,7 +77,11 @@ shift_roles = sqlalchemy.Table(
 
 # R0903: Too few public methods (0/2) (too-few-public-methods)
 class Shift(Alchemy_Base):  # pylint: disable=R0903
-    """An actual shift instance"""
+    """An instance of a specific shift
+    date - The date on which the shift occurs
+    start_time - The number of minutes since midnight that the shift starts
+    end_time - The number of minutes since midnight that the shift ends
+    """
 
     __tablename__ = "shift"
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
@@ -131,7 +102,12 @@ class Shift(Alchemy_Base):  # pylint: disable=R0903
 
 # R0903: Too few public methods (0/2) (too-few-public-methods)
 class UserRolePreference(Alchemy_Base):  # pylint: disable=R0903
-    """doc string"""
+    """The priority of a role at a restaurant for an employee and GM's priority
+    user_id / user - The employee
+    role_id / role - The role at a given restaurant
+    priority - The employee's priority for this restaurant's role
+    gm_priority - The GM's priority for this employee for this role
+    """
 
     __tablename__ = "user_role_preference"
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
@@ -153,7 +129,11 @@ class UserRolePreference(Alchemy_Base):  # pylint: disable=R0903
 
 # R0903: Too few public methods (0/2) (too-few-public-methods)
 class UserLimits(Alchemy_Base):  # pylint: disable=R0903
-    """doc string"""
+    """The GM's notes and hours limit for an employee
+    user_id / user - The employee
+    hours_limit - The maximum number of hours to schedule an employee
+    notes - GM's notes about the employee
+    """
 
     __tablename__ = "user_limits"
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
@@ -176,7 +156,13 @@ class UserLimits(Alchemy_Base):  # pylint: disable=R0903
 
 # R0903: Too few public methods (0/2) (too-few-public-methods)
 class ScheduledShift(Alchemy_Base):  # pylint: disable=R0903
-    """doc string"""
+    """An instance of a scheduled shift
+    date - The date of the shift
+    shift_id / shift - The shift that is scheduled
+    role_id / role - The role for this shift
+    user_id / user - The employee scheduled
+    draft - If not draft then it is published for employee to see
+    """
 
     __tablename__ = "scheduled_shift"
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
@@ -199,7 +185,18 @@ class ScheduledShift(Alchemy_Base):  # pylint: disable=R0903
 
 # R0903: Too few public methods (0/2) (too-few-public-methods)
 class UserShiftDefaultRequest(Alchemy_Base):  # pylint: disable=R0903
-    """doc string"""
+    """The default shifts available for an employee
+    user_id / user - The employee
+    restaurant_id / restaurant - The restaurant
+    day_of_week - The name of the day of the week
+    start_time - The number of minutes since midnight that the priority starts
+    end_time - The number of minutes since midnight that the priority ends
+    priority -
+        1 - want to work
+        2 - could work
+        3 - prefer not to work
+        4 - cannot work
+    """
 
     __tablename__ = "user_shift_default_request"
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
@@ -227,7 +224,15 @@ class UserShiftDefaultRequest(Alchemy_Base):  # pylint: disable=R0903
 
 # R0903: Too few public methods (0/2) (too-few-public-methods)
 class UserShfitRequest(Alchemy_Base):  # pylint: disable=R0903
-    """doc string"""
+    """Overrides UserShiftDefaultRequest for this time period
+    user_id / user - The employee
+    restaurant_id / restaurant - The restaurant
+    date - The date of the shift
+    start_time - The number of minutes since midnight that the priority starts
+    end_time - The number of minutes since midnight that the priority ends
+    priority - The new priority for this time period
+    note - Any notes to share with the GM about this time
+    """
 
     __tablename__ = "user_shift_request"
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
@@ -255,7 +260,11 @@ class UserShfitRequest(Alchemy_Base):  # pylint: disable=R0903
 
 # R0903: Too few public methods (0/2) (too-few-public-methods)
 class Role(Alchemy_Base):  # pylint: disable=R0903
-    """doc string"""
+    """The employee roles at a restaurant
+    name - The name of the role
+    restaurant_id / restaurant - the restaurant this role is for
+    preferences - all the employee preferences for this role
+    """
 
     __tablename__ = "role"
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
@@ -276,7 +285,11 @@ class Role(Alchemy_Base):  # pylint: disable=R0903
 
 # R0903: Too few public methods (0/2) (too-few-public-methods)
 class Restaurant(Alchemy_Base):  # pylint: disable=R0903
-    """location"""
+    """The restaurant location
+    name - the name of the restaurant
+    gm_id / gm - the general manager (may be null)
+    roles - list of Roles associated with the restaurant
+    """
 
     __tablename__ = "restaurant"
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
@@ -287,12 +300,23 @@ class Restaurant(Alchemy_Base):  # pylint: disable=R0903
 
     def __repr__(self):
         """display string"""
-        return f'Restaurant(id={self.id} name="{self.name}" gm="{self.gm.name}")'
+        return (
+            f'Restaurant(id={self.id} name="{self.name}" '
+            + f'gm="{self.gm.name if self.gm else None}")'
+        )
 
 
 # R0903: Too few public methods (0/2) (too-few-public-methods)
 class User(Alchemy_Base):  # pylint: disable=R0903
-    """user in database"""
+    """Represents an employee
+    name - Full employee name
+    email - The email to contact the employee at
+    password_hash - sha256 hash of the user's password
+    hours_limit - The maximum number of hours per week
+    admin - true if this is an admin account
+    gm_at - list of restaurants this user is a gm at
+    roles - the role priorities at each restaurant
+    """
 
     __tablename__ = "user"
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
@@ -303,10 +327,6 @@ class User(Alchemy_Base):  # pylint: disable=R0903
     admin = sqlalchemy.Column(sqlalchemy.Boolean)
     gm_at = sqlalchemy.orm.relationship("Restaurant")
     roles = sqlalchemy.orm.relationship("UserRolePreference")
-    # m = schedule manager, a = admin, g = general manager, s = shift worker
-    # roles = sqlalchemy.Column(sqlalchemy.String(4))
-    # last_login = sqlalchemy.Column(sqlalchemy.DateTime)
-    # rank = sqlalchemy.Column(sqlalchemy.Float)
 
     @staticmethod
     def hash_password(text):
@@ -377,7 +397,7 @@ class Database:
     # Mark: User API
 
     def create_user(self, email, password, name, **kwargs):
-        """doc string"""
+        """create a new employee entry"""
         found = self.find_user(email)
         return (
             self.__add(
@@ -393,7 +413,7 @@ class Database:
         )
 
     def get_user(self, user_id):
-        """doc string"""
+        """Get a user by its id"""
         return (
             self.__session().query(User).filter(User.id == int(user_id)).one_or_none()
             if user_id is not None
@@ -401,7 +421,7 @@ class Database:
         )
 
     def add_user_to_restaurant(self, user, restaurant):
-        """doc string"""
+        """Makes sure the employee has a UserRolePreference for every restaurant role"""
         priority = 1.0 + (max([r.priority for r in user.roles]) if user.roles else 0.0)
         preferred_roles = [r.id for r in user.roles]
 
@@ -418,7 +438,7 @@ class Database:
                 priority += 1.0
 
     def find_user(self, email):
-        """doc string"""
+        """Get a user by email (case insensitive)"""
         return (
             self.__session()
             .query(User)
@@ -427,13 +447,13 @@ class Database:
         )
 
     def get_users(self):
-        """doc string"""
+        """Get list of all users"""
         return self.__session().query(User).all()
 
     # Mark: Role API
 
     def create_role(self, restaurant_id, name):
-        """doc string"""
+        """Create a new role for a restaurant"""
         return (
             self.__add(Role(name=name, restaurant_id=restaurant_id))
             if len(name) > 0
@@ -443,11 +463,11 @@ class Database:
     # Mark: Restaurant API
 
     def create_restaurant(self, name):
-        """doc string"""
+        """Create a new restaurant"""
         return self.__add(Restaurant(name=name))
 
     def get_restaurant(self, restaurant_id):
-        """doc string"""
+        """Get a restaurant by id"""
         return (
             (
                 self.__session()
@@ -460,5 +480,5 @@ class Database:
         )
 
     def get_restaurants(self):
-        """doc string"""
+        """Get list of all restaurants"""
         return self.__session().query(Restaurant).all()

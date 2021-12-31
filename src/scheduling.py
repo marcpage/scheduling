@@ -45,10 +45,13 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         email = request.form["email"]  # Request module is used to fetch users "email" and "password"
         password = request.form["password"]
         user = database.find_user(email)
+
         if user is None and email.lower() == "marcallenpage@gmail.com":  # Checking whether the user exits in the
             # database
+        if user is None and not database.get_users():
+
             user = database.create_user(
-                email, password, "Marc", hours_limit=0.0, admin=True
+                email, password, "Admin", hours_limit=0.0, admin=True
             )
         elif user is None:  # Redirects the user if not found in the database
             return redirect("/#user_not_found")
@@ -147,7 +150,12 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         admin_user = user.admin if user is not None else False
         user_list = database.get_users() if admin_user else []
-        restaurant_list = database.get_restaurants() if admin_user else []
+        if admin_user:
+            restaurant_list = database.get_restaurants()
+        elif user.gm_at:
+            restaurant_list = user.gm_at
+        else:
+            restaurant_list = list({p.role.restaurant for p in user.roles})
         user_restaurants_by_id = {}
         for role in user.roles if user is not None else []:
             user_restaurants_by_id[role.role.restaurant.id] = role.role.restaurant
@@ -180,9 +188,11 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         user_list = database.get_users() if admin_user else []
         gm_user_roles = [p for r in found.roles for p in r.preferences]
         gm_user_roles.sort(key=lambda r: r.gm_priority)
-        user_restaurant_roles = [
-            r for r in user.roles if r.role.restaurant_id == int(restaurant_id)
-        ]
+        user_restaurant_roles = (
+            [r for r in user.roles if r.role.restaurant_id == int(restaurant_id)]
+            if user is not None
+            else []
+        )
         user_restaurant_roles.sort(key=lambda r: r.priority)
         return render_template(
             "restaurant.html",
