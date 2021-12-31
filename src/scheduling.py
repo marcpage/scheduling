@@ -49,6 +49,7 @@ def create_app(storage_url, source_dir, template_dir):
 
     @app.route("/")
     def home():
+        """default location for the server, home"""
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         return render_template("index.html", user=user)
 
@@ -56,6 +57,7 @@ def create_app(storage_url, source_dir, template_dir):
 
     @app.route("/logout")
     def logout():
+        """remove user cookie and redirect back to home"""
         response = make_response(redirect("/"))
         response.set_cookie(USER_ID_COOKIE, "", expires=0)
         return response
@@ -138,6 +140,7 @@ def create_app(storage_url, source_dir, template_dir):
 
     @app.route("/create_restaurant", methods=["POST"])
     def create_restaurant():
+        """Creates a restaurant object"""
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
 
         if user is None or not user.admin:
@@ -150,6 +153,7 @@ def create_app(storage_url, source_dir, template_dir):
 
     @app.route("/restaurant/<restaurant_id>/set_gm", methods=["POST"])
     def set_restaurant_gm(restaurant_id):
+        """Sets the gm for a restaurant"""
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         gm_id = request.form["gm_id"]
         general_manager = database.get_user(gm_id)
@@ -174,6 +178,7 @@ def create_app(storage_url, source_dir, template_dir):
 
     @app.route("/restaurant/<restaurant_id>/add_availability", methods=["POST"])
     def add_restaurant_availability(restaurant_id):
+        """adds user availability for a restaurant"""
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         restaurant = database.get_restaurant(restaurant_id)
         day_of_week = request.form["day_of_week"]
