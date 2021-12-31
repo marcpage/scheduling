@@ -46,8 +46,7 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         password = request.form["password"]
         user = database.find_user(email)
 
-        if user is None and email.lower() == "marcallenpage@gmail.com":  # Checking whether the user exits in the
-            # database
+
         if user is None and not database.get_users():
 
             user = database.create_user(
