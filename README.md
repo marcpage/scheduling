@@ -1,11 +1,5 @@
 
-![example workflow](https://github.com/marcpage/scheduling/actions/workflows/CI.yml/badge.svg)
-![example workflow](https://github.com/marcpage/scheduling/actions/workflows/CI.yml/badge.svg)
-[![Issues](https://img.shields.io/github/issues-raw/marcpage/scheduling?maxAge=25000)](https://github.com/marcpage/scheduling/issues)  
-[![GitHub pull requests](https://img.shields.io/github/issues-pr/marcpage/scheduling?style=flat)]()
-[![PR's Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com)
-[![GitHub contributors](https://img.shields.io/github/contributors/marcpage/scheduling?style=flat)]()  
-[![GitHub commit activity the past week, 4 weeks](https://img.shields.io/github/commit-activity/y/marcpage/scheduling?style=flat)]() 
+![example workflow](https://github.com/marcpage/scheduling/actions/workflows/CI.yml/badge.svg) [![Issues](https://img.shields.io/github/issues-raw/marcpage/scheduling?maxAge=25000)](https://github.com/marcpage/scheduling/issues)  [![GitHub pull requests](https://img.shields.io/github/issues-pr/marcpage/scheduling?style=flat)]() [![PR's Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com) [![GitHub contributors](https://img.shields.io/github/contributors/marcpage/scheduling?style=flat)]()  [![GitHub commit activity the past week, 4 weeks](https://img.shields.io/github/commit-activity/y/marcpage/scheduling?style=flat)]()
 
 # Staff Scheduling
 Restaurant staff scheduling website
