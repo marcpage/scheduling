@@ -39,7 +39,8 @@ def convert_from_html_time(html_time):
 
 # R0915: Too many statements (51/50) (too-many-statements)
 # R0914: Too many local variables (16/15) (too-many-locals)
-def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,R0915
+def create_app(storage_url, source_dir, template_dir):
+    # pylint: disable=R0914,R0915
     """create the flask app"""
     app = Flask(__name__, static_folder=source_dir, template_folder=template_dir)
     database = model.Database(storage_url)
@@ -61,14 +62,18 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
 
     @app.route("/login", methods=["POST"])
     def login():
+        """Using POST method for Employee login"""
         email = request.form["email"]
         password = request.form["password"]
         user = database.find_user(email)
+
         if user is None and not database.get_users():
+            # Creates Employee in the database if not exists
             user = database.create_user(
                 email, password, "Admin", hours_limit=0.0, admin=True
             )
         elif user is None:
+            # Redirects the user if not found in the database
             return redirect("/#user_not_found")
         restaurants = {r.id: r for r in user.gm_at}
         restaurants.update(
@@ -87,6 +92,7 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
 
     @app.route("/create_user", methods=["POST"])
     def create_user():
+        """Creates Employee"""
         name = request.form["name"]
         email = request.form["email"]
         password = request.form["password"]
@@ -95,7 +101,9 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         )
         restaurant = database.get_restaurant(request.form["restaurant_id"])
         if restaurant is not None:
+            # Adds Employee to restaurant in the database
             database.add_user_to_restaurant(user, restaurant)
+
         if not user.password_matches(password):
             return redirect("/#user_account_already_exists")
         if restaurant is None:
@@ -107,6 +115,7 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
 
     @app.route("/set_role_priority", methods=["POST"])
     def set_role_priority():
+        """Route to set_role_priority using 'POST'"""
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         if user is None:
             return (render_template("404.html", path="???"), 404)
@@ -132,6 +141,8 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
 
         if user is None or not user.admin:
+            # If user is not both EMPLOYEE OR ADMIN
+            # then return Error 404 Page
             return (render_template("404.html", path="???"), 404)
 
         created = database.create_restaurant(request.form["name"])
@@ -151,6 +162,7 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
 
     @app.route("/restaurant/<restaurant_id>/add_role", methods=["POST"])
     def add_restaurant_role(restaurant_id):
+        """Adds restaurant role taking 'restaurant_id' as parameter"""
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         restaurant = database.get_restaurant(restaurant_id)
         name = request.form["name"]
@@ -192,6 +204,7 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
 
     @app.route("/welcome")
     def welcome():
+        """Fetches Employee from database"""
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         admin_user = user.admin if user is not None else False
         user_list = database.get_users() if admin_user else []
@@ -225,6 +238,7 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
 
     @app.route("/restaurant/<restaurant_id>")
     def restaurant(restaurant_id):
+        """Fetches Employee "USER_ID_COOKIE' from database"""
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         found = database.get_restaurant(restaurant_id)
 
@@ -256,6 +270,7 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
 
     @app.errorhandler(404)
     def page_not_found(error):
+        """Returns error page 404"""
         print(error)
         return (render_template("404.html", path="???"), 404)
 

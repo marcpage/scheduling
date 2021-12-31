@@ -1,3 +1,7 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+=======
 # macOS hidden files
 .DS_Store
 
@@ -136,3 +140,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
