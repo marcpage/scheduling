@@ -51,7 +51,7 @@ fi
 
 echo "##[group] Running python unit tests"
 echo "##[command]python3 -m unittest discover -s src/tests -t src"
-python3 -m unittest discover -s src/tests -t src
+python3 -m unittest discover -s src/tests -t src 2>&1 | sed "/SAWarning:/s/^/##[warning]/"
 export TEST_STATUS=$?
 echo "##[endgroup]"
 if [ $TEST_STATUS -ne 0 ]; then
