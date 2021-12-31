@@ -19,7 +19,8 @@ class Date(sqlalchemy.types.TypeDecorator):  # pylint: disable=W0223
     impl = sqlalchemy.types.Date
 
     def process_bind_param(self, value, dialect):
-        try:  # if it is a string, parse it, otherwise it must be datetime object
+        # if it is a string, parse it, otherwise it must be datetime object
+        try:
             return datetime.datetime.strptime(value, "%Y/%m/%d %H:%M:%S")
         except TypeError:
             return value
@@ -68,9 +69,13 @@ class DefaultShift(Alchemy_Base):  # pylint: disable=R0903
         """display string"""
         roles = ", ".join([r.name for r in self.roles])
         return (
-            f'DefaultShift(id={self.id} day="{self.day_of_week}" start time="{self.start_time}" '
-            + f"end time={self.end_time} priority={self.priority} "
-            + f"start date={self.start_date} end date={self.end_date} "
+            f"DefaultShift(id={self.id} "
+            + f'day="{self.day_of_week}" '
+            + f'start time="{self.start_time}" '
+            + f"end time={self.end_time} "
+            + f"priority={self.priority} "
+            + f"start date={self.start_date} "
+            + f"end date={self.end_date} "
             + f'roles="{roles}")'
         )
 
@@ -106,8 +111,12 @@ class Shift(Alchemy_Base):  # pylint: disable=R0903
     def __repr__(self):
         """display string"""
         return (
-            f'Shift(id={self.id} date="{self.date}" start time="{self.start_time}" '
-            + f'end time={self.end_time} priority={self.priority} note="{self.note}")'
+            f"Shift(id={self.id} "
+            + f'date="{self.date}" '
+            + f'start time="{self.start_time}" '
+            + f"end time={self.end_time} "
+            + f"priority={self.priority} "
+            + f'note="{self.note}")'
         )
 
 
@@ -160,8 +169,11 @@ class UserLimits(Alchemy_Base):  # pylint: disable=R0903
     def __repr__(self):
         """display string"""
         return (
-            f'UserLimits(id={self.id} gm="{self.gm.name}" user="{self.user.name}" '
-            + f"hours={self.hours_limit} notes={self.notes})"
+            f"UserLimits(id={self.id} "
+            + f'gm="{self.gm.name}" '
+            + f'user="{self.user.name}" '
+            + f"hours={self.hours_limit} "
+            + f"notes={self.notes})"
         )
 
 
@@ -189,8 +201,12 @@ class ScheduledShift(Alchemy_Base):  # pylint: disable=R0903
     def __repr__(self):
         """display string"""
         return (
-            f'ScheduledShift(id={self.id} date="{self.date}" shift="{self.shift}" '
-            + f"role={self.role.name} user={self.user.name} draft={self.draft})"
+            f"ScheduledShift(id={self.id} "
+            + f'date="{self.date}" '
+            + f'shift="{self.shift}" '
+            + f"role={self.role.name} "
+            + f"user={self.user.name} "
+            + f"draft={self.draft})"
         )
 
 
@@ -401,7 +417,8 @@ class Database:
         )
 
     def add_user_to_restaurant(self, user, restaurant):
-        """Makes sure the employee has a UserRolePreference for every restaurant role"""
+        """Makes sure the employee has a UserRolePreference for
+        every restaurant role"""
         priority = 1.0 + (max([r.priority for r in user.roles]) if user.roles else 0.0)
         preferred_roles = [r.id for r in user.roles]
 
