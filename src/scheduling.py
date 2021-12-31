@@ -6,6 +6,7 @@
 import argparse
 import os
 import time
+import datetime
 
 from flask import Flask, render_template, request, redirect, make_response
 
@@ -18,6 +19,22 @@ STORAGE_PATH = os.path.join(
 STORAGE = "sqlite:///" + STORAGE_PATH
 USER_ID_COOKIE = "session"
 MAXIMUM_FUTURE_DATE_IN_SECONDS = 1 * 365 * 24 * 60 * 60.0
+
+
+def convert_from_html_date(html_date):
+    """Converts dates sent through html forms to dates suitable for the database
+        html_date - Date of the format 2021-12-31
+    """
+    return datetime.datetime.strptime(html_date, "%Y-%m-%d")
+
+
+def convert_from_html_time(html_time):
+    """Converts times sent through html forms to dates suitable for the database
+        html_time - Time of the format 9:00 AM
+        returns number of minutes since 12:00 AM
+    """
+    parsed = time.strptime(html_time, "%I:%M %p")
+    return parsed.tm_hour * 60 + parsed.tm_min
 
 
 # R0915: Too many statements (51/50) (too-many-statements)
@@ -137,10 +154,31 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         restaurant = database.get_restaurant(restaurant_id)
         name = request.form["name"]
-        required_field_empty = name is None or user is None or restaurant is None
+        required_field_empty = user is None or restaurant is None
         if required_field_empty or restaurant.gm_id != user.id:
             return (render_template("404.html", path="???"), 404)
         database.create_role(restaurant_id, name)
+        return redirect(f"/restaurant/{restaurant_id}")
+
+    @app.route("/restaurant/<restaurant_id>/add_availability", methods=["POST"])
+    def add_restaurant_availability(restaurant_id):
+        user = database.get_user(request.cookies.get(USER_ID_COOKIE))
+        restaurant = database.get_restaurant(restaurant_id)
+        day_of_week = request.form["day_of_week"]
+        priority = request.form["priority"]
+        start_date = convert_from_html_date(request.form["start_date"])
+        end_date = convert_from_html_date(request.form["end_date"])
+        start_time = convert_from_html_time(request.form["start_time"])
+        end_time = convert_from_html_time(request.form["end_time"])
+        note = request.form["note"]
+        if user is None or restaurant is None:
+            return (render_template("404.html", path="???"), 404)
+
+        database.create_availability(user=user, restaurant=restaurant, day_of_week=day_of_week,
+            start_date=start_date, start_time=start_time,
+            end_date=end_date, end_time=end_time,
+            priority=priority, note=note if note else None)
+
         return redirect(f"/restaurant/{restaurant_id}")
 
     # Mark: Actual websites
@@ -192,8 +230,7 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         gm_user_roles.sort(key=lambda r: r.gm_priority)
         user_restaurant_roles = (
             [r for r in user.roles if r.role.restaurant_id == int(restaurant_id)]
-            if user is not None
-            else []
+            if user is not None else []
         )
         user_restaurant_roles.sort(key=lambda r: r.priority)
         return render_template(

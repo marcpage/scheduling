@@ -307,6 +307,7 @@ class User(Alchemy_Base):  # pylint: disable=R0903
     admin = sqlalchemy.Column(sqlalchemy.Boolean)
     gm_at = sqlalchemy.orm.relationship("Restaurant")
     roles = sqlalchemy.orm.relationship("UserRolePreference")
+    availabilities = sqlalchemy.orm.relationship("UserAvailability")
 
     @staticmethod
     def hash_password(text):
@@ -432,7 +433,7 @@ class Database:
 
     # Mark: Availability API
 
-    def create_default_availability(self, user, restaurant, day_of_week, **kwargs):
+    def create_availability(self, user, restaurant, day_of_week, **kwargs):
         """Create an availability"""
         return self.__add(
             UserAvailability(
@@ -445,24 +446,6 @@ class Database:
                 end_time=kwargs["end_time"],
                 priority=kwargs["priority"],
                 note=kwargs["note"],
-            )
-        )
-
-    def get_default_availability(self, user, restaurant, day_of_week, **kwargs):
-        """Get availabilities within a date range"""
-        return (
-            self.__session()
-            .query(UserAvailability)
-            .filter(
-                sqlalchemy.sql.expression.and_(
-                    UserAvailability.user_id == user.id,
-                    UserAvailability.restaurant_id == restaurant.id,
-                    UserAvailability.day_of_week == day_of_week,
-                    sqlalchemy.sql.expression.or_(
-                        UserAvailability.end_date >= kwargs["start_date"],
-                        UserAvailability.start_date <= kwargs["end_date"],
-                    ),
-                )
             )
         )
 

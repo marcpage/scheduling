@@ -152,6 +152,22 @@
             <input type="submit" value="add availability"/>
         </form>
 
+        <ul>
+        {% for availability in user.availabilities %}
+            {% if availability.restaurant_id == restaurant.id %}
+                <li>
+                    day_of_week: {{ availability.day_of_week }}
+                    start: {{ availability.start_date }}
+                    end: {{ availability.end_date }}
+                    earliest: {{ availability.start_time }}
+                    latest: {{ availability.end_time }}
+                    priority: {{ availability.priority }}
+                    note: {{ availability.note }}
+                </li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+
     {% elif user %}
 <!--  ==================== Logged non-employee ====================  -->
 
