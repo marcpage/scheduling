@@ -37,7 +37,7 @@
     {% endif %}
 
     <ul>
-    {% for restaurant in user.gm_at %}
+    {% for restaurant in restaurant_list %}
         <li><a href="/restaurant/{{ restaurant.id }}">{{ restaurant.name }}</a></li>
     {% endfor %}
     </ul>

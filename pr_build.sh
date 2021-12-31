@@ -1,5 +1,9 @@
 #!bash
 
+echo "##[group] Environment"
+env
+echo "##[endgroup]"
+
 export OS_TYPE=`uname -s`
 if [ "$OS_TYPE" = "Darwin" ]; then
     export VENV_DIR=$HOME/Library/Caches/venv/scheduling;
