@@ -27,6 +27,7 @@ Wouldn't it be great as an employee if you had to have someone cover you you cou
     * [Merge changes from main branch](#merge-changes-from-main-branch)
   * [Create a Pull Request](#create-a-pull-request)
   * [Get ready for the next change](#get-ready-for-the-next-change)
+  * [Working on Windows](#working-on-windows)
 
 # How to work in the codebase
 
