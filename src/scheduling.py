@@ -149,9 +149,8 @@ def create_app(storage_url, source_dir, template_dir):
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         restaurant = database.get_restaurant(restaurant_id)
         name = request.form["name"]
-        r_f_e = name is None or user is None or restaurant is None
-        # r_f_e stands for required_field_empty
-        if r_f_e or restaurant.gm_id != user.id:
+        required_field_empty = user is None or restaurant is None
+        if required_field_empty or restaurant.gm_id != user.id:
             return (render_template("404.html", path="???"), 404)
         database.create_role(restaurant_id, name)
         return redirect(f"/restaurant/{restaurant_id}")
