@@ -11,6 +11,7 @@ import time
 import sqlalchemy
 import sqlalchemy.ext.declarative
 
+
 # W0223: Method 'python_type' is abstract in class 'TypeEngine' but is not overridden
 class Date(sqlalchemy.types.TypeDecorator):  # pylint: disable=W0223
     """database date format"""
