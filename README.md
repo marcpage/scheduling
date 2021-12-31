@@ -1,4 +1,5 @@
 
+![example workflow](https://github.com/marcpage/scheduling/actions/workflows/CI.yml/badge.svg)
 
 # Staff Scheduling
 Restaurant staff scheduling website
