@@ -11,18 +11,19 @@ from flask import Flask, render_template, request, redirect, make_response
 import model
 
 # TODO: template # pylint: disable=W0511
-STORAGE_PATH = os.path.join(
-    os.environ["HOME"], "Library", "Preferences", "scheduling.sqlite3"
-)
+STORAGE_PATH = os.path.join(os.environ["HOME"],
+                            "Library", "Preferences", "scheduling.sqlite3")
 STORAGE = "sqlite:///" + STORAGE_PATH
 USER_ID_COOKIE = "session"
 
 
 # R0915: Too many statements (51/50) (too-many-statements)
 # R0914: Too many local variables (16/15) (too-many-locals)
-def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,R0915
+def create_app(storage_url, source_dir, template_dir):
+    # pylint: disable=R0914,R0915
     """create the flask app"""
-    app = Flask(__name__, static_folder=source_dir, template_folder=template_dir)
+    app = Flask(__name__, static_folder=source_dir,
+                template_folder=template_dir)
     database = model.Database(storage_url)
 
     # Mark: Root
@@ -40,20 +41,20 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         response.set_cookie(USER_ID_COOKIE, "", expires=0)
         return response
 
-    @app.route("/login", methods=["POST"])  # using POST method for user login
+    @app.route("/login", methods=["POST"])
     def login():
-        email = request.form["email"]  # Request module is used to fetch users "email" and "password"
+        """Using POST method for Employee login"""
+        email = request.form["email"]
         password = request.form["password"]
         user = database.find_user(email)
 
-        if user is None and email.lower() == "marcallenpage@gmail.com":  # Checking whether the user exits in the
-            # database
         if user is None and not database.get_users():
-
+            # Creates Employee in the database if not exists
             user = database.create_user(
                 email, password, "Admin", hours_limit=0.0, admin=True
             )
-        elif user is None:  # Redirects the user if not found in the database
+        elif user is None:
+            """Redirects the user if not found in the database"""
             return redirect("/#user_not_found")
 
         response = make_response(redirect("/welcome"))
@@ -61,9 +62,11 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         return response
 
     # Mark: User Actions
+    """Creates Employee in the database using 'POST method' """
 
     @app.route("/create_user", methods=["POST"])
-    def create_user():  # Creates user
+    def create_user():
+        """ " Creates Employee"""
         name = request.form["name"]
         email = request.form["email"]
         password = request.form["password"]
@@ -72,18 +75,21 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         )
         restaurant = database.get_restaurant(request.form["restaurant_id"])
         if restaurant is not None:
-            database.add_user_to_restaurant(user, restaurant)  # adds user to data restaurant
-        if not user.password_matches(password):  # Redirects if password don't match
+            # Adds Employee to restaurant in the database
+            database.add_user_to_restaurant(user, restaurant)
+
+        if not user.password_matches(password):
             return redirect("/#user_account_already_exists")
         response = make_response(redirect("/welcome"))
         response.set_cookie(USER_ID_COOKIE, str(user.id), secure=False)
         return response
 
     @app.route("/set_role_priority", methods=["POST"])
-    def set_role_priority():  # Sets role priority
+    def set_role_priority():
+        """Route to set_role_priority using 'POST' """
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         if user is None:
-            return (render_template("404.html", path="???"), 404)  # returns Error 404 Page if user not found in db
+            return (render_template("404.html", path="???"), 404)
         for role in user.roles:
             new_priority = request.form[f"{role.id}_priority"]
             if new_priority is not None:
@@ -92,16 +98,17 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         return redirect("/welcome")
 
     @app.route("/restaurant/<restaurant_id>")
-    def restaurant(restaurant_id):  # Fetches user from database
+    def restaurant(restaurant_id):
+        """Fetches Employee data from database using 'USER_ID_COOKIE'"""
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         found = database.get_restaurant(restaurant_id)
 
-        if not found:  # If user not found returns Error 404 Page
+        if not found:
             return (render_template("404.html", path="???"), 404)
         restaurant = database.get_restaurant(request.form["restaurant_id"])
         if restaurant is None:
             return redirect("/welcome")
-          
+
         for role in [p for r in restaurant.roles for p in r.preferences]:
             new_gm_priority = request.form[f"{role.id}_gm_priority"]
             if new_gm_priority is not None:
@@ -110,11 +117,15 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
 
     # Mark: Restaurant Actions
 
-    @app.route("/create_restaurant", methods=["POST"])  # Creates restaurant
+    """Creates restaurant"""
+
+    @app.route("/create_restaurant", methods=["POST"])
     def create_restaurant():
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
 
         if user is None or not user.admin:
+            """If user is not both EMPLOYEE OR ADMIN 
+                then return Error 404 Page"""
             return (render_template("404.html", path="???"), 404)
 
         created = database.create_restaurant(request.form["name"])
@@ -133,7 +144,8 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         return redirect(f"/restaurant/{restaurant_id}")
 
     @app.route("/restaurant/<restaurant_id>/add_role", methods=["POST"])
-    def add_restaurant_role(restaurant_id):  # adds restaurant role
+    def add_restaurant_role(restaurant_id):
+        """Adds restaurant role taking 'restaurant_id' as parameter"""
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         restaurant = database.get_restaurant(restaurant_id)
         name = request.form["name"]
@@ -147,6 +159,7 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
 
     @app.route("/welcome")
     def welcome():
+        """Fetches Employee from database"""
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         admin_user = user.admin if user is not None else False
         user_list = database.get_users() if admin_user else []
@@ -178,6 +191,7 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
 
     @app.route("/restaurant/<restaurant_id>")
     def restaurant(restaurant_id):
+        """Fetches Employee "USER_ID_COOKIE' from database"""
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         found = database.get_restaurant(restaurant_id)
 
@@ -189,7 +203,9 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         gm_user_roles = [p for r in found.roles for p in r.preferences]
         gm_user_roles.sort(key=lambda r: r.gm_priority)
         user_restaurant_roles = (
-            [r for r in user.roles if r.role.restaurant_id == int(restaurant_id)]
+            [r for r in user.roles
+                if r.role.restaurant_id == int(restaurant_id)
+            ]
             if user is not None
             else []
         )
@@ -204,7 +220,8 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         )
 
     @app.errorhandler(404)
-    def page_not_found(error):  # returns page not found error
+    def page_not_found(error):
+        """Returns error page 404"""
         print(error)
         return (render_template("404.html", path="???"), 404)
 
@@ -223,7 +240,8 @@ def parse_args():
         help="The port to listen on (default 8000)",
     )
     parser.add_argument(
-        "-s", "--storage", default=STORAGE, help="SqlAlchemy url to store information"
+        "-s", "--storage", default=STORAGE,
+        help="SqlAlchemy url to store information"
     )
     parser.add_argument(
         "-u",
@@ -232,7 +250,8 @@ def parse_args():
         default="ui",
         help="Path to the directory with ui files.",
     )
-    parser.add_argument("-d", "--debug", default=True, help="Run debug server.")
+    parser.add_argument("-d", "--debug", default=True,
+                        help="Run debug server.")
     args = parser.parse_args()
 
     return args
