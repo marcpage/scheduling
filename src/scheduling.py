@@ -19,6 +19,7 @@ STORAGE = "sqlite:///" + STORAGE_PATH
 USER_ID_COOKIE = "session"
 MAXIMUM_FUTURE_DATE_IN_SECONDS = 1 * 365 * 24 * 60 * 60.0
 
+
 # R0915: Too many statements (51/50) (too-many-statements)
 # R0914: Too many local variables (16/15) (too-many-locals)
 def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,R0915
