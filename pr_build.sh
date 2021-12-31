@@ -43,9 +43,4 @@ fi
 
 if [ "$1" = "run" ]; then python3 src/scheduling.py; fi
 
-echo $BLACK_STATUS
-echo $PYLINT_STATUS
-echo $FLAKE8_STATUS
-echo $TEST_STATUS
-echo $(($BLACK_STATUS + $PYLINT_STATUS + $FLAKE8_STATUS + $TEST_STATUS))
 exit $(($BLACK_STATUS + $PYLINT_STATUS + $FLAKE8_STATUS + $TEST_STATUS))
