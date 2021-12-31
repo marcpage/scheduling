@@ -8,7 +8,7 @@ This will facilitate the communication of schedule between employees and manager
 
 Restaurant turn-over is a huge challenge to establishing standard practices in scheduling. 
 Wouldn't it be great as a restaurant employee if there was a standard way to communicate when you want to work, when you could work, when you'd rather not work, and when you cannot work? 
-Wouldn't it be great as a schedule manager or general manager if you could have a system that takes employee input, your input and automatically creates schedules for each week?
+Wouldn't it be great as a schedule manager or general manager if you could have a system that takes employee input, your input and automatically creates a starting point for the schedule for each week?
 Wouldn't it be great as an employee if you had to have someone cover you you could have a list of employees ranked from those who would most like to work that shift to least like to work that shift?
 
 * [How to work in the codebase](#how-to-work-in-the-codebase)
