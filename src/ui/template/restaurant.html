@@ -45,25 +45,26 @@
             <input type="submit" value="add"/>
         </form>
 
-        <form action="/set_role_priority" method="POST">
-            <input type="hidden" name="restaurant_id" value="{{ restaurant.id }}">
-            <ul>
-                {% for preference in user_roles %}
-                    <li>
-                        <input type="number"
-                            name="{{ preference.id }}_gm_priority"
-                            value="{{ preference.gm_priority }}"
-                            min=1
-                            max=100
-                            step=1/>
-                        {{ preference.role.name }}
-                        {{ preference.user.name }}
-                    </li>
-                {% endfor %}
-            </ul>
-            <input type="submit" value="change role priority"/>
-        </form>
-
+        {% if user_roles %}
+            <form action="/set_role_priority" method="POST">
+                <input type="hidden" name="restaurant_id" value="{{ restaurant.id }}">
+                <ul>
+                    {% for preference in user_roles %}
+                        <li>
+                            <input type="number"
+                                name="{{ preference.id }}_gm_priority"
+                                value="{{ preference.gm_priority }}"
+                                min=1
+                                max=100
+                                step=1/>
+                            {{ preference.role.name }}
+                            {{ preference.user.name }}
+                        </li>
+                    {% endfor %}
+                </ul>
+                <input type="submit" value="change role priority"/>
+            </form>
+        {% endif %}
 
     {% elif user and user_restaurant_roles %}
 <!--  ==================== Employee ====================  -->
