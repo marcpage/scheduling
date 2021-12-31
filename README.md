@@ -59,14 +59,14 @@ You only have to call `flush()` once, even for multiple changes to multiple obje
 
 Make sure all files are saved to disk.
 
-`./pr_build.sh fix`
+`./pr_build.sh fix` (Note: pr_build.sh has only been tested on macOS and Ubuntu)
 
 This will reformat your code, and run some checks on it. 
 If any of the checks fail, you must address these problems before submitting.
 
 ## Run the code
 
-`./pr_build.sh run`
+`./pr_build.sh run` (Note: pr_build.sh has only been tested on macOS and Ubuntu)
 
 This will check the changes again, and start the web server (on port `8000`).
 You can try out your changes by going to http://localhost:8000/
@@ -78,7 +78,7 @@ This allows you to make changes and refresh the page and see the changes.
 
 First, verify that your changes are still valid.
 
-`./pr_build.sh fix`
+`./pr_build.sh fix` (Note: pr_build.sh has only been tested on macOS and Ubuntu)
 
 ### Create a new source branch
 
@@ -156,4 +156,8 @@ After the pull request is complete, `main` now has newer source than you have on
 
 You can now go back to the [Modify the source](#modify-the-source) step above.
 
+## Working on Windows
+
+The commands in `pr_build.sh` can be used to determine how to work on Windows.
+Contribution of `pr_build.bat` to support Windows are definitely welcome.
 
