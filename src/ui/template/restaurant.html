@@ -71,6 +71,7 @@
 
         <a href="/logout">logout</a><br/>
         Welcome, {{ user.name }}.
+
         <p>Please make sure these are ordered in your order of preference.</p>
         {% if user_restaurant_roles %}
         <form action="/set_role_priority" method="POST">
@@ -92,6 +93,64 @@
         </form>
         {% endif %}
 
+        <p>Add general availability</p>
+        <form action="/restaurant/{{ restaurant.id }}/add_availability" method="POST">
+            <select
+                title="Day of the week"
+                name="day_of_week">
+                <option value="0">Monday</option>
+                <option value="1">Tuesday</option>
+                <option value="2">Wednesday</option>
+                <option value="3">Thursday</option>
+                <option value="4">Friday</option>
+                <option value="5">Saturday</option>
+                <option value="6">Sunday</option>
+            </select>
+            <select
+                title="Availability"
+                name="priority">
+                <option value="1">Want to work</option>
+                <option value="2">Could work</option>
+                <option value="3">Prefer not to work</option>
+                <option value="4">Cannot work</option>
+            </select>
+            <br/>
+            <input type="date"
+                   name="start_date"
+                   value="{{today}}"
+                   title="Start date"
+                   min="{{today}}"
+                   max="{{latest_date}}">
+            -
+            <input type="date"
+                   name="end_date"
+                   value="{{latest_date}}"
+                   title="End date"
+                   min="{{today}}"
+                   max="{{latest_date}}">
+            <br/>
+            <input name="start_time"
+                    type="text"
+                    minlength=5
+                    value="9:00 AM"
+                    size=8
+                    pattern="\d\d?:\d\d [AaPp][mM]"
+                    title="Start time"
+                    requred/>
+            -
+            <input name="end_time"
+                    type="text"
+                    minlength=5
+                    value="5:00 PM"
+                    size=8
+                    pattern="\d\d?:\d\d [AaPp][mM]"
+                    title="End time"
+                    requred/>
+            <br/>
+            <textarea name="note" rows="4" cols="50" placeholder="Notes for scheduler if needed"></textarea>
+            <br/>
+            <input type="submit" value="add availability"/>
+        </form>
 
     {% elif user %}
 <!--  ==================== Logged non-employee ====================  -->
