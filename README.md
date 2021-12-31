@@ -11,6 +11,7 @@ Wouldn't it be great as a restaurant employee if there was a standard way to com
 Wouldn't it be great as a schedule manager or general manager if you could have a system that takes employee input, your input and automatically creates a starting point for the schedule for each week?
 Wouldn't it be great as an employee if you had to have someone cover you you could have a list of employees ranked from those who would most like to work that shift to least like to work that shift?
 
+* [Why is this public domain](#why-is-this-public-domain)
 * [How to work in the codebase](#how-to-work-in-the-codebase)
   * [Get the latest source](#get-the-latest-source)
   * [Modify the source](#modify-the-source)
@@ -28,6 +29,18 @@ Wouldn't it be great as an employee if you had to have someone cover you you cou
   * [Create a Pull Request](#create-a-pull-request)
   * [Get ready for the next change](#get-ready-for-the-next-change)
   * [Working on Windows](#working-on-windows)
+
+# Why is this public domain
+
+`If this fills such a valuable need for restaurants, why are you putting the source in the public domain?`
+
+I believe that those who have the technical skills to implement this for their restaurant can save themselves a lot of time and money.
+For those other restaurants that do not have those with the skills to deploy this, enterprising people with the skills can sell this solution to them.
+I feel there is a great need in society for this tool. 
+If I try to sell it by myself, I may make a lot of money but I will not be able to fulfill the need as effectively as several people going out and filling that need.
+
+If you wish to sell your services to set this up for a restaurant or even for several restaurants, please do.
+If you receive feedback, please contribute it back here, but most of all, fill the need.
 
 # How to work in the codebase
 
