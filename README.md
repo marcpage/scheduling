@@ -4,7 +4,7 @@
 # Staff Scheduling
 Restaurant staff scheduling website
 
-The goal is to have a website that can be deployed to an Amazon Elastic Cloud instance and would support mulitple restaurants.
+The goal is to have a website that can be deployed to an Amazon Elastic Cloud instance and would support multiple restaurants.
 This will facilitate the communication of schedule between employees and managers.
 
 Restaurant turn-over is a huge challenge to establishing standard practices in scheduling. 
