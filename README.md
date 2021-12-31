@@ -94,43 +94,43 @@ This allows you to make changes and refresh the page and see the changes.
 The first step in the boot-strap process is to create an admin account. 
 The first user to log in creates an admin account.
 
-<img width="438" alt="Screen Shot 2021-12-30 at 10 00 13 PM" src="https://user-images.githubusercontent.com/695749/147803534-921b7948-d016-4075-918c-6e140514784b.png">
+<kbd><img width="438" alt="Screen Shot 2021-12-30 at 10 00 13 PM" src="https://user-images.githubusercontent.com/695749/147803534-921b7948-d016-4075-918c-6e140514784b.png"></kbd>
 
 Once the admin account is created, the admin can create a restaurant.
 
-<img width="265" alt="Screen Shot 2021-12-30 at 10 01 02 PM" src="https://user-images.githubusercontent.com/695749/147803589-1b29d7be-5db8-4aa8-8ef8-30866718ff2a.png">
+<kbd><img width="265" alt="Screen Shot 2021-12-30 at 10 01 02 PM" src="https://user-images.githubusercontent.com/695749/147803589-1b29d7be-5db8-4aa8-8ef8-30866718ff2a.png"></kbd>
 
 After the restaurant is created, log out and create the general manager account on the restaurant page: http://localhost:8000/restaurant/1
 
-<img width="472" alt="Screen Shot 2021-12-30 at 10 02 43 PM" src="https://user-images.githubusercontent.com/695749/147803602-a0d0c794-6b1b-46d4-aee6-8aac25bd3ee1.png">
+<kbd><img width="472" alt="Screen Shot 2021-12-30 at 10 02 43 PM" src="https://user-images.githubusercontent.com/695749/147803602-a0d0c794-6b1b-46d4-aee6-8aac25bd3ee1.png"></kbd>
 
 Log out of the GM's account.
 
-<img width="345" alt="Screen Shot 2021-12-30 at 10 02 54 PM" src="https://user-images.githubusercontent.com/695749/147803659-90cedf29-e970-4658-97bd-cb5ff2262bb2.png">
+<kbd><img width="345" alt="Screen Shot 2021-12-30 at 10 02 54 PM" src="https://user-images.githubusercontent.com/695749/147803659-90cedf29-e970-4658-97bd-cb5ff2262bb2.png"></kbd>
 
 Log in as the admin account and go to the new restaurant's page.
 
-<img width="309" alt="Screen Shot 2021-12-30 at 10 03 08 PM" src="https://user-images.githubusercontent.com/695749/147803671-3884e393-672a-4ab2-b84f-1fab3c7d642f.png">
+<kbd><img width="309" alt="Screen Shot 2021-12-30 at 10 03 08 PM" src="https://user-images.githubusercontent.com/695749/147803671-3884e393-672a-4ab2-b84f-1fab3c7d642f.png"></kbd>
 
 Set the GM account on the restaurant page.
 
-<img width="289" alt="Screen Shot 2021-12-30 at 10 03 24 PM" src="https://user-images.githubusercontent.com/695749/147803693-b35dc91b-9fc1-4721-99b0-2f8107e78616.png">
+<kbd><img width="289" alt="Screen Shot 2021-12-30 at 10 03 24 PM" src="https://user-images.githubusercontent.com/695749/147803693-b35dc91b-9fc1-4721-99b0-2f8107e78616.png"></kbd>
 
 Log out of the admin account and log back into the GM account.
 
-<img width="344" alt="Screen Shot 2021-12-30 at 10 04 33 PM" src="https://user-images.githubusercontent.com/695749/147803715-0cff3421-3a95-43f1-911c-d7d5b91a7606.png">
+<kbd><img width="344" alt="Screen Shot 2021-12-30 at 10 04 33 PM" src="https://user-images.githubusercontent.com/695749/147803715-0cff3421-3a95-43f1-911c-d7d5b91a7606.png"></kbd>
 
 Go to the restaurant's page and add the roles.
 
-<img width="399" alt="Screen Shot 2021-12-30 at 10 05 15 PM" src="https://user-images.githubusercontent.com/695749/147803731-f90d2c9e-d881-44a8-a459-7402cbf097af.png">
+<kbd><img width="399" alt="Screen Shot 2021-12-30 at 10 05 15 PM" src="https://user-images.githubusercontent.com/695749/147803731-f90d2c9e-d881-44a8-a459-7402cbf097af.png"></kbd>
 
 Log out and create an employee account on the restaurant page: http://localhost:8000/restaurant/1
 
-<img width="497" alt="Screen Shot 2021-12-30 at 10 06 57 PM" src="https://user-images.githubusercontent.com/695749/147803741-41c06fc6-278b-435a-85fd-0a23ab3b4f48.png">
+<kbd><img width="497" alt="Screen Shot 2021-12-30 at 10 06 57 PM" src="https://user-images.githubusercontent.com/695749/147803741-41c06fc6-278b-435a-85fd-0a23ab3b4f48.png"></kbd>
 
 You can now set the employee's priority for the different roles.
 
-<img width="422" alt="Screen Shot 2021-12-30 at 10 11 07 PM" src="https://user-images.githubusercontent.com/695749/147803779-7835ff76-4f01-47f7-9b99-2c0072ace34c.png">
+<kbd><img width="422" alt="Screen Shot 2021-12-30 at 10 11 07 PM" src="https://user-images.githubusercontent.com/695749/147803779-7835ff76-4f01-47f7-9b99-2c0072ace34c.png"></kbd>
 
 ## Submit the code
 
@@ -199,7 +199,7 @@ After the pull request is created, respond to comments, fix anything needed.
 Changes can be made, and then you can `commit` and `push` (see above) to update your branch.
 Once everything is good, you can complete the pull request (green `Squash and merge` button near the bottom).
 
-<img width="553" alt="Screen Shot 2021-12-30 at 11 45 48 AM" src="https://user-images.githubusercontent.com/695749/147775964-eb40d818-8ce0-4cb8-b31f-2191726616e8.png">
+`<img` width="553" alt="Screen Shot 2021-12-30 at 11 45 48 AM" src="https://user-images.githubusercontent.com/695749/147775964-eb40d818-8ce0-4cb8-b31f-2191726616e8.png">
 
 The confirm the completion by pressing the green `Confirm squash and merge` button.
 
