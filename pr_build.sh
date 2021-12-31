@@ -52,7 +52,7 @@ $LOG_ECHO "##[command]flake8 --max-line-length=100 $SOURCES"
 flake8 --max-line-length=100 $SOURCES
 export FLAKE8_STATUS=$?
 $LOG_ECHO "##[endgroup]"
-if [ $PYLINT_STATUS -ne 0 ]; then
+if [ $FLAKE8_STATUS -ne 0 ]; then
     echo $ERROR_PREFIX"💥💥 Please fix the above flake8 errors and resubmit 💥💥 "
 else
     echo "✅ flake8 verification successful"

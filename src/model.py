@@ -12,6 +12,7 @@ import sqlalchemy
 import sqlalchemy.ext.declarative
 
 
+# W0223: Method 'python_type' is abstract in class 'TypeEngine' but is not overridden
 class Date(sqlalchemy.types.TypeDecorator):  # pylint: disable=W0223
     """database date format"""
 
@@ -37,21 +38,26 @@ Alchemy_Base = sqlalchemy.ext.declarative.declarative_base()
 default_shift_roles = sqlalchemy.Table(
     "default_shift_roles",
     Alchemy_Base.metadata,
-    sqlalchemy.Column("role_id",
-                      sqlalchemy.ForeignKey("role.id")),
-    sqlalchemy.Column("default_shift_id",
-                      sqlalchemy.ForeignKey("default_shift.id")),
+    sqlalchemy.Column("role_id", sqlalchemy.ForeignKey("role.id")),
+    sqlalchemy.Column("default_shift_id", sqlalchemy.ForeignKey("default_shift.id")),
 )
 
 
 # R0903: Too few public methods (0/2) (too-few-public-methods)
 class DefaultShift(Alchemy_Base):  # pylint: disable=R0903
-    """Default shifts to be scheduled during a date range"""
+    """Default shifts to be scheduled during a date range
+    day_of_week - The day of the week 0 = Monday
+    start_time - The number of minutes since midnight that the shift starts
+    end_time - The number of minutes since midnight that the shift ends
+    priority - The priority to fill this shift
+    start_date - The date this default is first available
+    end_date - The last date this default is viable
+    roles - The roles needed for the shift
+    """
 
     __tablename__ = "default_shift"
-    id = sqlalchemy.Column(sqlalchemy.Integer,
-                           primary_key=True, autoincrement=True)
-    day_of_week = sqlalchemy.Column(sqlalchemy.String(10))
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    day_of_week = sqlalchemy.Column(sqlalchemy.Integer)
     start_time = sqlalchemy.Column(sqlalchemy.Integer)
     end_time = sqlalchemy.Column(sqlalchemy.Integer)
     priority = sqlalchemy.Column(sqlalchemy.Float)
@@ -63,12 +69,13 @@ class DefaultShift(Alchemy_Base):  # pylint: disable=R0903
         """display string"""
         roles = ", ".join([r.name for r in self.roles])
         return (
-            f'DefaultShift(id={self.id}day="{self.day_of_week}\
-            "start time="{self.start_time}" '
-            + f"end time={self.end_time}\
-                priority={self.priority} "
-            + f"start date={self.start_date}\
-                    end date={self.end_date} "
+            f"DefaultShift(id={self.id} "
+            + f'day="{self.day_of_week}" '
+            + f'start time="{self.start_time}" '
+            + f"end time={self.end_time} "
+            + f"priority={self.priority} "
+            + f"start date={self.start_date} "
+            + f"end date={self.end_date} "
             + f'roles="{roles}")'
         )
 
@@ -87,11 +94,13 @@ class Shift(Alchemy_Base):  # pylint: disable=R0903
     date - The date on which the shift occurs
     start_time - The number of minutes since midnight that the shift starts
     end_time - The number of minutes since midnight that the shift ends
+    priority - The GM's priority for filling this shift
+    notes - Notes for the GM on this shift for employees
+    roles - The roles to fill for for this shift
     """
 
     __tablename__ = "shift"
-    id = sqlalchemy.Column(sqlalchemy.Integer,
-                           primary_key=True, autoincrement=True)
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     date = sqlalchemy.Column(sqlalchemy.DateTime)
     start_time = sqlalchemy.Column(sqlalchemy.Integer)
     end_time = sqlalchemy.Column(sqlalchemy.Integer)
@@ -102,12 +111,12 @@ class Shift(Alchemy_Base):  # pylint: disable=R0903
     def __repr__(self):
         """display string"""
         return (
-            f'Shift(id={self.id}\
-                 date="{self.date}\
-                     " start time="{self.start_time}" '
-            + f'end time={self.end_time}\
-                 priority={self.priority}\
-                      note="{self.note}")'
+            f"Shift(id={self.id} "
+            + f'date="{self.date}" '
+            + f'start time="{self.start_time}" '
+            + f"end time={self.end_time} "
+            + f"priority={self.priority} "
+            + f'note="{self.note}")'
         )
 
 
@@ -121,13 +130,10 @@ class UserRolePreference(Alchemy_Base):  # pylint: disable=R0903
     """
 
     __tablename__ = "user_role_preference"
-    id = sqlalchemy.Column(sqlalchemy.Integer,
-                           primary_key=True, autoincrement=True)
-    user_id = sqlalchemy.Column(sqlalchemy.Integer,
-                                sqlalchemy.ForeignKey("user.id"))
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"))
     user = sqlalchemy.orm.relationship("User")
-    role_id = sqlalchemy.Column(sqlalchemy.Integer,
-                                sqlalchemy.ForeignKey("role.id"))
+    role_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("role.id"))
     role = sqlalchemy.orm.relationship("Role")
     priority = sqlalchemy.Column(sqlalchemy.Float)
     gm_priority = sqlalchemy.Column(sqlalchemy.Float)
@@ -150,14 +156,12 @@ class UserLimits(Alchemy_Base):  # pylint: disable=R0903
     """
 
     __tablename__ = "user_limits"
-    id = sqlalchemy.Column(sqlalchemy.Integer,
-                           primary_key=True, autoincrement=True)
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     restaurant_id = sqlalchemy.Column(
         sqlalchemy.Integer, sqlalchemy.ForeignKey("restaurant.id")
     )
     restaurant = sqlalchemy.orm.relationship("Restaurant")
-    user_id = sqlalchemy.Column(sqlalchemy.Integer,
-                                sqlalchemy.ForeignKey("user.id"))
+    user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"))
     user = sqlalchemy.orm.relationship("User")
     hours_limit = sqlalchemy.Column(sqlalchemy.Integer)
     notes = sqlalchemy.Column(sqlalchemy.String(50))
@@ -165,11 +169,11 @@ class UserLimits(Alchemy_Base):  # pylint: disable=R0903
     def __repr__(self):
         """display string"""
         return (
-            f'UserLimits(id={self.id}\
-                 gm="{self.gm.name}\
-                     " user="{self.user.name}" '
-            + f"hours={self.hours_limit}\
-                 notes={self.notes})"
+            f"UserLimits(id={self.id} "
+            + f'gm="{self.gm.name}" '
+            + f'user="{self.user.name}" '
+            + f"hours={self.hours_limit} "
+            + f"notes={self.notes})"
         )
 
 
@@ -184,111 +188,69 @@ class ScheduledShift(Alchemy_Base):  # pylint: disable=R0903
     """
 
     __tablename__ = "scheduled_shift"
-    id = sqlalchemy.Column(sqlalchemy.Integer,
-                           primary_key=True, autoincrement=True)
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     date = sqlalchemy.Column(sqlalchemy.DateTime)
-    shift_id = sqlalchemy.Column(sqlalchemy.Integer,
-                                 sqlalchemy.ForeignKey("shift.id"))
+    shift_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("shift.id"))
     shift = sqlalchemy.orm.relationship("Shift")
-    role_id = sqlalchemy.Column(sqlalchemy.Integer,
-                                sqlalchemy.ForeignKey("role.id"))
+    role_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("role.id"))
     role = sqlalchemy.orm.relationship("Role")
-    user_id = sqlalchemy.Column(sqlalchemy.Integer,
-                                sqlalchemy.ForeignKey("user.id"))
+    user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"))
     user = sqlalchemy.orm.relationship("User")
     draft = sqlalchemy.Column(sqlalchemy.Boolean)
 
     def __repr__(self):
         """display string"""
         return (
-            f'ScheduledShift(id={self.id}\
-                 date="{self.date}\
-                     " shift="{self.shift}" '
-            + f"role={self.role.name} \
-                user={self.user.name} \
-                    draft={self.draft})"
+            f"ScheduledShift(id={self.id} "
+            + f'date="{self.date}" '
+            + f'shift="{self.shift}" '
+            + f"role={self.role.name} "
+            + f"user={self.user.name} "
+            + f"draft={self.draft})"
         )
 
 
 # R0903: Too few public methods (0/2) (too-few-public-methods)
-class UserShiftDefaultRequest(Alchemy_Base):  # pylint: disable=R0903
-    """The default shifts available for an employee
+class UserAvailability(Alchemy_Base):  # pylint: disable=R0903
+    """The times available for an employee
     user_id / user - The employee
     restaurant_id / restaurant - The restaurant
-    day_of_week - The name of the day of the week
+    day_of_week - The day of the week 0 = Monday
     start_time - The number of minutes since midnight that the priority starts
     end_time - The number of minutes since midnight that the priority ends
-    priority -
+    start_date - The date this default is first available
+    end_date - The last date this default is viable
+    priority - Meaning of this time slot
         1 - want to work
         2 - could work
         3 - prefer not to work
         4 - cannot work
+    note - Any notes about this time slot
     """
 
-    __tablename__ = "user_shift_default_request"
-    id = sqlalchemy.Column(sqlalchemy.Integer,
-                           primary_key=True, autoincrement=True)
-    user_id = sqlalchemy.Column(sqlalchemy.Integer,
-                                sqlalchemy.ForeignKey("user.id"))
+    __tablename__ = "user_availability"
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"))
     user = sqlalchemy.orm.relationship("User")
     restaurant_id = sqlalchemy.Column(
         sqlalchemy.Integer, sqlalchemy.ForeignKey("restaurant.id")
     )
     restaurant = sqlalchemy.orm.relationship("Restaurant")
-    day_of_week = sqlalchemy.Column(sqlalchemy.String(10))
+    day_of_week = sqlalchemy.Column(sqlalchemy.Integer)
     start_time = sqlalchemy.Column(sqlalchemy.Integer)
     end_time = sqlalchemy.Column(sqlalchemy.Integer)
+    start_date = sqlalchemy.Column(sqlalchemy.DateTime)
+    end_date = sqlalchemy.Column(sqlalchemy.DateTime)
     priority = sqlalchemy.Column(sqlalchemy.Float)
     note = sqlalchemy.Column(sqlalchemy.String(50))
 
     def __repr__(self):
         """display string"""
         return (
-            f'UserShiftDefaultRequest(id={self.id} user="{self.user.name}" '
+            f'UserAvailability(id={self.id} user="{self.user.name}" '
             + f'restaurant="{self.restaurant.name}" day={self.day_of_week} '
             + f"start_time={self.start_time} end_time={self.end_time} "
             + f'priority={self.priority} note="{self.note}")'
-        )
-
-
-# R0903: Too few public methods (0/2) (too-few-public-methods)
-class UserShfitRequest(Alchemy_Base):  # pylint: disable=R0903
-    """Overrides UserShiftDefaultRequest for this time period
-    user_id / user - The employee
-    restaurant_id / restaurant - The restaurant
-    date - The date of the shift
-    start_time - The number of minutes since midnight that the priority starts
-    end_time - The number of minutes since midnight that the priority ends
-    priority - The new priority for this time period
-    note - Any notes to share with the GM about this time
-    """
-
-    __tablename__ = "user_shift_request"
-    id = sqlalchemy.Column(sqlalchemy.Integer,
-                           primary_key=True, autoincrement=True)
-    user_id = sqlalchemy.Column(sqlalchemy.Integer,
-                                sqlalchemy.ForeignKey("user.id"))
-    user = sqlalchemy.orm.relationship("User")
-    restaurant_id = sqlalchemy.Column(
-        sqlalchemy.Integer, sqlalchemy.ForeignKey("restaurant.id")
-    )
-    restaurant = sqlalchemy.orm.relationship("Restaurant")
-    date = sqlalchemy.Column(sqlalchemy.DateTime)
-    start_time = sqlalchemy.Column(sqlalchemy.Integer)
-    end_time = sqlalchemy.Column(sqlalchemy.Integer)
-    priority = sqlalchemy.Column(sqlalchemy.Float)
-    note = sqlalchemy.Column(sqlalchemy.String(50))
-
-    def __repr__(self):
-        """display string"""
-        return (
-            f'UserShfitRequest(id={self.id} user="{self.user.name}" '
-            + f'restaurant="{self.restaurant.name}" '
-            + f"date={self.date} \
-                start_time={self.start_time}\
-                    end_time={self.end_time} "
-            + f'priority={self.priority}\
-                 note="{self.note}")'
         )
 
 
@@ -301,8 +263,7 @@ class Role(Alchemy_Base):  # pylint: disable=R0903
     """
 
     __tablename__ = "role"
-    id = sqlalchemy.Column(sqlalchemy.Integer,
-                           primary_key=True, autoincrement=True)
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     name = sqlalchemy.Column(sqlalchemy.String(50))
     restaurant_id = sqlalchemy.Column(
         sqlalchemy.Integer, sqlalchemy.ForeignKey("restaurant.id")
@@ -327,11 +288,9 @@ class Restaurant(Alchemy_Base):  # pylint: disable=R0903
     """
 
     __tablename__ = "restaurant"
-    id = sqlalchemy.Column(sqlalchemy.Integer,
-                           primary_key=True, autoincrement=True)
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     name = sqlalchemy.Column(sqlalchemy.String(50))
-    gm_id = sqlalchemy.Column(sqlalchemy.Integer,
-                              sqlalchemy.ForeignKey("user.id"))
+    gm_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"))
     gm = sqlalchemy.orm.relationship("User")
     roles = sqlalchemy.orm.relationship("Role")
 
@@ -356,8 +315,7 @@ class User(Alchemy_Base):  # pylint: disable=R0903
     """
 
     __tablename__ = "user"
-    id = sqlalchemy.Column(sqlalchemy.Integer,
-                           primary_key=True, autoincrement=True)
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     name = sqlalchemy.Column(sqlalchemy.String(50))
     email = sqlalchemy.Column(sqlalchemy.String(50))
     password_hash = sqlalchemy.Column(sqlalchemy.String(64))
@@ -453,18 +411,15 @@ class Database:
     def get_user(self, user_id):
         """Get a user by its id"""
         return (
-            self.__session().query(User).filter
-            (User.id == int(user_id)).one_or_none()
+            self.__session().query(User).filter(User.id == int(user_id)).one_or_none()
             if user_id is not None
             else None
         )
 
     def add_user_to_restaurant(self, user, restaurant):
-        """Makes sure the employee has a
-        UserRolePreference for every
-        restaurant role"""
-        priority = 1.0 + (max([r.priority for r in user.roles])
-                          if user.roles else 0.0)
+        """Makes sure the employee has a UserRolePreference for
+        every restaurant role"""
+        priority = 1.0 + (max([r.priority for r in user.roles]) if user.roles else 0.0)
         preferred_roles = [r.id for r in user.roles]
 
         for role in restaurant.roles:
@@ -484,14 +439,49 @@ class Database:
         return (
             self.__session()
             .query(User)
-            .filter(sqlalchemy.func.
-                    lower(User.email) == sqlalchemy.func.lower(email))
+            .filter(sqlalchemy.func.lower(User.email) == sqlalchemy.func.lower(email))
             .one_or_none()
         )
 
     def get_users(self):
         """Get list of all users"""
         return self.__session().query(User).all()
+
+    # Mark: Availability API
+
+    def create_default_availability(self, user, restaurant, day_of_week, **kwargs):
+        """Create an availability"""
+        return self.__add(
+            UserAvailability(
+                user_id=user.id,
+                restaurant_id=restaurant.id,
+                day_of_week=day_of_week,
+                start_time=kwargs["start_time"],
+                start_date=kwargs["start_date"],
+                end_date=kwargs["end_date"],
+                end_time=kwargs["end_time"],
+                priority=kwargs["priority"],
+                note=kwargs["note"],
+            )
+        )
+
+    def get_default_availability(self, user, restaurant, day_of_week, **kwargs):
+        """Get availabilities within a date range"""
+        return (
+            self.__session()
+            .query(UserAvailability)
+            .filter(
+                sqlalchemy.sql.expression.and_(
+                    UserAvailability.user_id == user.id,
+                    UserAvailability.restaurant_id == restaurant.id,
+                    UserAvailability.day_of_week == day_of_week,
+                    sqlalchemy.sql.expression.or_(
+                        UserAvailability.end_date >= kwargs["start_date"],
+                        UserAvailability.start_date <= kwargs["end_date"],
+                    ),
+                )
+            )
+        )
 
     # Mark: Role API
 

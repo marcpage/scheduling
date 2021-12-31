@@ -5,6 +5,7 @@
 
 import argparse
 import os
+import time
 
 from flask import Flask, render_template, request, redirect, make_response
 
@@ -16,6 +17,7 @@ STORAGE_PATH = os.path.join(
 )
 STORAGE = "sqlite:///" + STORAGE_PATH
 USER_ID_COOKIE = "session"
+MAXIMUM_FUTURE_DATE_IN_SECONDS = 1 * 365 * 24 * 60 * 60.0
 
 
 # R0915: Too many statements (51/50) (too-many-statements)
@@ -23,8 +25,7 @@ USER_ID_COOKIE = "session"
 def create_app(storage_url, source_dir, template_dir):
     # pylint: disable=R0914,R0915
     """create the flask app"""
-    app = Flask(__name__, static_folder=source_dir,
-                template_folder=template_dir)
+    app = Flask(__name__, static_folder=source_dir, template_folder=template_dir)
     database = model.Database(storage_url)
 
     # Mark: Root
@@ -57,8 +58,16 @@ def create_app(storage_url, source_dir, template_dir):
         elif user is None:
             # Redirects the user if not found in the database
             return redirect("/#user_not_found")
-
-        response = make_response(redirect("/welcome"))
+        restaurants = {r.id: r for r in user.gm_at}
+        restaurants.update(
+            {p.role.restaurant.id: p.role.restaurant for p in user.roles}
+        )
+        if len(restaurants) == 1:
+            response = make_response(
+                redirect(f"/restaurant/{list(restaurants.values())[0].id}")
+            )
+        else:
+            response = make_response(redirect("/welcome"))
         response.set_cookie(USER_ID_COOKIE, str(user.id), secure=False)
         return response
 
@@ -80,7 +89,10 @@ def create_app(storage_url, source_dir, template_dir):
 
         if not user.password_matches(password):
             return redirect("/#user_account_already_exists")
-        response = make_response(redirect("/welcome"))
+        if restaurant is None:
+            response = make_response(redirect("/welcome"))
+        else:
+            response = make_response(redirect(f"/restaurant/{restaurant.id}"))
         response.set_cookie(USER_ID_COOKIE, str(user.id), secure=False)
         return response
 
@@ -91,11 +103,19 @@ def create_app(storage_url, source_dir, template_dir):
         if user is None:
             return (render_template("404.html", path="???"), 404)
         for role in user.roles:
-            new_priority = request.form[f"{role.id}_priority"]
+            new_priority = request.form.get(f"{role.id}_priority", None)
             if new_priority is not None:
                 role.priority = float(new_priority)
         database.flush()
-        return redirect("/welcome")
+        restaurant = database.get_restaurant(request.form["restaurant_id"])
+        if restaurant is None:
+            return redirect("/welcome")
+
+        for role in [p for r in restaurant.roles for p in r.preferences]:
+            new_gm_priority = request.form.get(f"{role.id}_gm_priority", None)
+            if new_gm_priority is not None:
+                role.gm_priority = float(new_gm_priority)
+        return redirect(f"/restaurant/{restaurant.id}")
 
     # Mark: Restaurant Actions
 
@@ -146,13 +166,15 @@ def create_app(storage_url, source_dir, template_dir):
         user_list = database.get_users() if admin_user else []
         if admin_user:
             restaurant_list = database.get_restaurants()
-        elif user.gm_at:
-            restaurant_list = user.gm_at
         else:
-            restaurant_list = list({p.role.restaurant for p in user.roles})
+            restaurants = {r.id: r for r in user.gm_at}
+            restaurants.update(
+                {p.role.restaurant.id: p.role.restaurant for p in user.roles}
+            )
+            restaurant_list = list(restaurants.values())
         user_restaurants_by_id = {}
         for role in user.roles if user is not None else []:
-            [role.role.restaurant.id] = role.role.restaurant
+            user_restaurants_by_id[role.role.restaurant.id] = role.role.restaurant
         sorted_roles = (
             sorted(user.roles, key=lambda r: r.priority) if user.roles else []
         )
@@ -184,8 +206,7 @@ def create_app(storage_url, source_dir, template_dir):
         gm_user_roles = [p for r in found.roles for p in r.preferences]
         gm_user_roles.sort(key=lambda r: r.gm_priority)
         user_restaurant_roles = (
-            [r for r in user.roles
-                if r.role.restaurant_id == int(restaurant_id)]
+            [r for r in user.roles if r.role.restaurant_id == int(restaurant_id)]
             if user is not None
             else []
         )
@@ -197,6 +218,10 @@ def create_app(storage_url, source_dir, template_dir):
             user_list=user_list,
             user_roles=gm_user_roles,
             user_restaurant_roles=user_restaurant_roles,
+            today=time.strftime("%Y-%m-%d"),
+            latest_date=time.strftime(
+                "%Y-%m-%d", time.localtime(time.time() + MAXIMUM_FUTURE_DATE_IN_SECONDS)
+            ),
         )
 
     @app.errorhandler(404)
@@ -220,8 +245,7 @@ def parse_args():
         help="The port to listen on (default 8000)",
     )
     parser.add_argument(
-        "-s", "--storage", default=STORAGE,
-        help="SqlAlchemy url to store information"
+        "-s", "--storage", default=STORAGE, help="SqlAlchemy url to store information"
     )
     parser.add_argument(
         "-u",
@@ -230,8 +254,7 @@ def parse_args():
         default="ui",
         help="Path to the directory with ui files.",
     )
-    parser.add_argument("-d", "--debug",
-                        default=True, help="Run debug server.")
+    parser.add_argument("-d", "--debug", default=True, help="Run debug server.")
     args = parser.parse_args()
 
     return args
