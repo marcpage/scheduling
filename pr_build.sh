@@ -19,25 +19,25 @@ export SOURCES="src/*.py"
 
 black $CHECK $SOURCES
 export BLACK_STATUS=$?
-if [[ $BLACK_STATUS -ne 0 ]]; then
+if [ $BLACK_STATUS -ne 0 ]; then
     echo "💥💥 Please run black on this source to reformat and resubmit 💥💥 "
 fi
 
 pylint $SOURCES
 export PYLINT_STATUS=$?
-if [[ $PYLINT_STATUS -ne 0 ]]; then
+if [ $PYLINT_STATUS -ne 0 ]; then
     echo "💥💥 Please fix the above pylint errors and resubmit 💥💥 "
 fi
 
 flake8 --max-line-length=100 $SOURCES
 export FLAKE8_STATUS=$?
-if [[ $PYLINT_STATUS -ne 0 ]]; then
+if [ $PYLINT_STATUS -ne 0 ]; then
     echo "💥💥 Please fix the above flake8 errors and resubmit 💥💥 "
 fi
 
 python3 -m unittest discover -s src/tests -t src
 export TEST_STATUS=$?
-if [[ $TEST_STATUS -ne 0 ]]; then
+if [ $TEST_STATUS -ne 0 ]; then
     echo "💥💥 Please fix the above test failures and resubmit 💥💥 "
 fi
 
