@@ -23,15 +23,15 @@ MAXIMUM_FUTURE_DATE_IN_SECONDS = 1 * 365 * 24 * 60 * 60.0
 
 def convert_from_html_date(html_date):
     """Converts dates sent through html forms to dates suitable for the database
-        html_date - Date of the format 2021-12-31
+    html_date - Date of the format 2021-12-31
     """
     return datetime.datetime.strptime(html_date, "%Y-%m-%d")
 
 
 def convert_from_html_time(html_time):
     """Converts times sent through html forms to dates suitable for the database
-        html_time - Time of the format 9:00 AM
-        returns number of minutes since 12:00 AM
+    html_time - Time of the format 9:00 AM
+    returns number of minutes since 12:00 AM
     """
     parsed = time.strptime(html_time, "%I:%M %p")
     return parsed.tm_hour * 60 + parsed.tm_min
@@ -174,10 +174,17 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         if user is None or restaurant is None:
             return (render_template("404.html", path="???"), 404)
 
-        database.create_availability(user=user, restaurant=restaurant, day_of_week=day_of_week,
-            start_date=start_date, start_time=start_time,
-            end_date=end_date, end_time=end_time,
-            priority=priority, note=note if note else None)
+        database.create_availability(
+            user=user,
+            restaurant=restaurant,
+            day_of_week=day_of_week,
+            start_date=start_date,
+            start_time=start_time,
+            end_date=end_date,
+            end_time=end_time,
+            priority=priority,
+            note=note if note else None,
+        )
 
         return redirect(f"/restaurant/{restaurant_id}")
 
@@ -230,7 +237,8 @@ def create_app(storage_url, source_dir, template_dir):  # pylint: disable=R0914,
         gm_user_roles.sort(key=lambda r: r.gm_priority)
         user_restaurant_roles = (
             [r for r in user.roles if r.role.restaurant_id == int(restaurant_id)]
-            if user is not None else []
+            if user is not None
+            else []
         )
         user_restaurant_roles.sort(key=lambda r: r.priority)
         return render_template(
