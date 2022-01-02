@@ -53,7 +53,12 @@ def convert_from_html_time(html_time):
 def create_app(storage_url, source_dir, template_dir):
     # pylint: disable=R0914,R0915
     """create the flask app"""
-    app = Flask(__name__, static_folder=source_dir, template_folder=template_dir)
+    app = Flask(
+        __name__,
+        static_url_path="",
+        static_folder=source_dir,
+        template_folder=template_dir,
+    )
     database = model.Database(storage_url)
 
     # Mark: Root
