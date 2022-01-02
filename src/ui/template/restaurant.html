@@ -66,6 +66,55 @@
             </form>
         {% endif %}
 
+        <h2>Shifts</h2>
+        <form action="/restaurant/{{ restaurant.id }}/add_default_shift">
+            <select
+                title="Day of the week"
+                name="day_of_week">
+                <option value="0">Monday</option>
+                <option value="1">Tuesday</option>
+                <option value="2">Wednesday</option>
+                <option value="3">Thursday</option>
+                <option value="4">Friday</option>
+                <option value="5">Saturday</option>
+                <option value="6">Sunday</option>
+            </select>
+            <br/>
+            <input type="date"
+                   name="start_date"
+                   value="{{today}}"
+                   title="Start date"
+                   min="{{today}}"
+                   max="{{latest_date}}">
+            -
+            <input type="date"
+                   name="end_date"
+                   value="{{latest_date}}"
+                   title="End date"
+                   min="{{today}}"
+                   max="{{latest_date}}">
+            <br/>
+            <input name="start_time"
+                    type="text"
+                    minlength=5
+                    value="9:00 AM"
+                    size=8
+                    pattern="\d\d?:\d\d [AaPp][mM]"
+                    title="Start time"
+                    requred/>
+            -
+            <input name="end_time"
+                    type="text"
+                    minlength=5
+                    value="5:00 PM"
+                    size=8
+                    pattern="\d\d?:\d\d [AaPp][mM]"
+                    title="End time"
+                    requred/>
+            <br/>
+            <input type="submit" value="add shift"/>
+        </form>
+
     {% elif user and user_restaurant_roles %}
 <!--  ==================== Employee ====================  -->
 
