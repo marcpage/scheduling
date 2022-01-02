@@ -4,18 +4,28 @@
 """
 
 import argparse
-import os
-import time
 import datetime
+import os
+import platform
+import time
 
 from flask import Flask, render_template, request, redirect, make_response
 
 import model
 
 # TODO: template # pylint: disable=W0511
-STORAGE_PATH = os.path.join(
-    os.environ["HOME"], "Library", "Preferences", "scheduling.sqlite3"
-)
+
+if platform.system() == "Darwin":
+    STORAGE_PATH = os.path.join(
+        os.environ["HOME"], "Library", "Preferences", "scheduling.sqlite3"
+    )
+elif platform.system() == "Linux":
+    STORAGE_PATH = os.path.join(os.environ["HOME"], ".scheduling.sqlite3")
+elif platform.system() == "Windows":
+    STORAGE_PATH = os.path.join(os.environ["APPDATA"], "scheduling.sqlite3")
+else:
+    STORAGE_PATH = os.path.join(".scheduling.sqlite3")
+
 STORAGE = "sqlite:///" + STORAGE_PATH
 USER_ID_COOKIE = "session"
 MAXIMUM_FUTURE_DATE_IN_SECONDS = 1 * 365 * 24 * 60 * 60.0
