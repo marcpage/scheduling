@@ -269,7 +269,7 @@ class Role(Alchemy_Base):  # pylint: disable=R0903
         sqlalchemy.Integer, sqlalchemy.ForeignKey("restaurant.id")
     )
     restaurant = sqlalchemy.orm.relationship("Restaurant")
-    preferences = sqlalchemy.orm.relationship("UserRolePreference")
+    preferences = sqlalchemy.orm.relationship("UserRolePreference", viewonly=True)
 
     def __repr__(self):
         """display string"""
@@ -292,7 +292,7 @@ class Restaurant(Alchemy_Base):  # pylint: disable=R0903
     name = sqlalchemy.Column(sqlalchemy.String(50))
     gm_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"))
     gm = sqlalchemy.orm.relationship("User")
-    roles = sqlalchemy.orm.relationship("Role")
+    roles = sqlalchemy.orm.relationship("Role", viewonly=True)
 
     def __repr__(self):
         """display string"""
@@ -321,9 +321,9 @@ class User(Alchemy_Base):  # pylint: disable=R0903
     password_hash = sqlalchemy.Column(sqlalchemy.String(64))
     hours_limit = sqlalchemy.Column(sqlalchemy.Integer)
     admin = sqlalchemy.Column(sqlalchemy.Boolean)
-    gm_at = sqlalchemy.orm.relationship("Restaurant")
-    roles = sqlalchemy.orm.relationship("UserRolePreference")
-    availabilities = sqlalchemy.orm.relationship("UserAvailability")
+    gm_at = sqlalchemy.orm.relationship("Restaurant", viewonly=True)
+    roles = sqlalchemy.orm.relationship("UserRolePreference", viewonly=True)
+    availabilities = sqlalchemy.orm.relationship("UserAvailability", viewonly=True)
 
     @staticmethod
     def hash_password(text):
