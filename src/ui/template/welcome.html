@@ -1,46 +1,58 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+</head>
 <body>
-<h1>Welcome {{ user.name }}</h1>
-    <a href="/logout">logout</a><br/>
-
-    {% if user.admin %}
-        Hey, admin.
-
-        <h2>Create Restaurant</h2>
-        <form action="/create_restaurant" method="POST">
-            <input name="name"
-                    type="text"
-                    minlength=5
-                    placeholder="Restaurant Name"
-                    size=25
-                    title="The Restaurant Name"
-                    requred autofocus />
-            <input type="submit" value="create"/>
-        </form>
-
-        <h2>Users</h2>
-        <ul>
-        {% for user in user_list %}
-            <li>{{ user.name }} ({{ user.email }})</li>
-        {% endfor %}
-        </ul>
-
-        <h2>Restaurants</h2>
+    <h1 id="wel">Welcome {{ user.name }}</h1>
+        <a href="/logout.html">logout</a><br/>
+    
+        {% if user.admin %}
+            Hey, admin.
+    
+            <h2 id="cr">Create Restaurant</h2>
+            <form action="/create_restaurant" method="POST">
+                <input name="name"
+                        type="text"
+                        minlength=5
+                        placeholder="Restaurant Name"
+                        size=25
+                        title="The Restaurant Name"
+                        requred autofocus />
+                <input type="submit" value="create"/>
+            </form>
+    
+            <h2 id="user">Users</h2>
+            <ul>
+            {% for user in user_list %}
+                <li>{{ user.name }} ({{ user.email }})</li>
+            {% endfor %}
+            </ul>
+    
+            <h2 id="res">Restaurants</h2>
+            <ul>
+            {% for restaurant in restaurant_list %}
+                <li><a href="/restaurant/{{ restaurant.id }}">{{ restaurant.name }}</a>
+                    (GM: {{ restaurant.gm }})</li>
+            {% endfor %}
+            </ul>
+    
+            Session ages: {{ sessions }}
+        {% endif %}
+    
         <ul>
         {% for restaurant in restaurant_list %}
-            <li><a href="/restaurant/{{ restaurant.id }}">{{ restaurant.name }}</a>
-                (GM: {{ restaurant.gm }})</li>
+            <li><a href="/restaurant/{{ restaurant.id }}">{{ restaurant.name }}</a></li>
         {% endfor %}
         </ul>
-
-        Session ages: {{ sessions }}
-    {% endif %}
-
-    <ul>
-    {% for restaurant in restaurant_list %}
-        <li><a href="/restaurant/{{ restaurant.id }}">{{ restaurant.name }}</a></li>
-    {% endfor %}
-    </ul>
-
-</body>
+    
+    <style>
+        #wel,#res,#user,#cr{
+            font-family: Arial, Helvetica, sans-serif;
+        }
+    </style>
+    </body>
 </html>
