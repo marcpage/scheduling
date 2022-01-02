@@ -69,6 +69,6 @@ else
     echo "✅ unit tests passed"
 fi
 
-if [ "$1" = "run" ]; then python3 src/scheduling.py; fi
+if [ "$1" = "run" ]; then python3 src/scheduling.py --test; fi
 
 exit $(($BLACK_STATUS + $PYLINT_STATUS + $FLAKE8_STATUS + $TEST_STATUS))
