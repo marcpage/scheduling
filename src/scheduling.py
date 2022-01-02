@@ -12,6 +12,7 @@ import time
 from flask import Flask, render_template, request, redirect, make_response
 
 import model
+import tests.prepopulate
 
 # TODO: template # pylint: disable=W0511
 
@@ -307,6 +308,9 @@ def parse_args():
         "-s", "--storage", default=STORAGE, help="SqlAlchemy url to store information"
     )
     parser.add_argument(
+        "-t", "--test", action="store_true", help="Preload data into the database"
+    )
+    parser.add_argument(
         "-u",
         "--ui",
         type=str,
@@ -323,6 +327,8 @@ def main():
     """Entry point. Loop forever unless we are told not to."""
 
     args = parse_args()
+    if args.test:
+        tests.prepopulate.load(args.storage)
     app = create_app(args.storage, args.ui, os.path.join(args.ui, "template"))
     app.run(host="0.0.0.0", debug=args.debug, port=args.port)
 
