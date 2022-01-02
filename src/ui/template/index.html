@@ -1,58 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Login</title>
-</head>
-<body>
-        <form method='POST' action="/login">
-                <h1 id="loginhead">LOGIN</h1>
-                <input name="email"
-                        type="text"
-                        minlength=5
-                        id="email"
-                        placeholder="Email Address"
-                        size=25
-                        pattern="[^@ \t\r\n]+@[^@]+\.[^@]+"
-                        title="your email address"
-                        required autofocus /><br><br>
-                <input name="password"
-                        type="password"
-                        id="pass"
-                        minlength=5
-                        placeholder="Password"
-                        size=25
-                        title="your password"
-                        required /><br><br>
-                <input type="reset" id = "resetbtn" placeholder="Reset">
-                <input type="submit" id = "loginbtn" value="Login"/>
-        </form>
-        <style>
-                form{
-                        text-align: center;
-                        
-                }
-                #resetbtn ,#loginbtn{
-                        width: 6em;
-                        height: 2.4em;
-                        font-size: 18px;
-                        font: bold;
-                        font-family: Arial, Helvetica, sans-serif;
-                        color: brown;
-                }
-                #email, #pass{
-                        width: 15pc;
-                        height: 2.4em;
-                        font-size: 15px;
-                        font-family: Arial, Helvetica, sans-serif;
-                }
-                #loginhead{
-                        font: bold;
-                        font-family: Arial, Helvetica, sans-serif;
-                        font-size: 50px;
-                }
-        </style>
-</body>
+    <head>
+            <meta charset="UTF-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                    form{
+                            text-align: center;
+
+                    }
+                    #resetbtn ,#loginbtn{
+                            width: 6em;
+                            height: 2.4em;
+                            font-size: 18px;
+                            font: bold;
+                            font-family: Arial, Helvetica, sans-serif;
+                            color: brown;
+                    }
+                    #email, #pass{
+                            width: 15pc;
+                            height: 2.4em;
+                            font-size: 15px;
+                            font-family: Arial, Helvetica, sans-serif;
+                    }
+                    #loginhead{
+                            font: bold;
+                            font-family: Arial, Helvetica, sans-serif;
+                            font-size: 50px;
+                    }
+            </style>
+            <title>Login</title>
+    </head>
+    <body>
+            <form method='POST' action="/login">
+                    <h1 id="loginhead">LOGIN</h1>
+                    <input name="email"
+                            type="text"
+                            minlength=5
+                            id="email"
+                            placeholder="Email Address"
+                            size=25
+                            pattern="[^@ \t\r\n]+@[^@]+\.[^@]+"
+                            title="your email address"
+                            required autofocus /><br><br>
+                    <input name="password"
+                            type="password"
+                            id="pass"
+                            minlength=5
+                            placeholder="Password"
+                            size=25
+                            title="your password"
+                            required /><br><br>
+                    <input type="reset" id = "resetbtn" placeholder="Reset">
+                    <input type="submit" id = "loginbtn" value="Login"/>
+            </form>
+    </body>
 </html>
