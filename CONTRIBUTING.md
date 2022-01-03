@@ -27,6 +27,7 @@ On Linux and macOS, you can just run `./pr_build.sh` which will validate your so
 `./pr_build.sh run` will run the web server on the default port `8000`.
 
 **Note:** [Issue #40](https://github.com/marcpage/scheduling/issues/40) is available to create a pr_build.bat for Windows to do similar behavior.
+This issue has details on how to run the various steps manually.
 
 ## Notes to refer to when adding to this document
 
