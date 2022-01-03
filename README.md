@@ -1,10 +1,9 @@
 
-![example workflow](https://github.com/marcpage/scheduling/actions/workflows/CI.yml/badge.svg) [![Issues](https://img.shields.io/github/issues-raw/marcpage/scheduling?maxAge=25000)](https://github.com/marcpage/scheduling/issues)  [![GitHub pull requests](https://img.shields.io/github/issues-pr/marcpage/scheduling?style=flat)]() [![PR's Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com) [![GitHub contributors](https://img.shields.io/github/contributors/marcpage/scheduling?style=flat)]()  [![GitHub commit activity the past week, 4 weeks](https://img.shields.io/github/commit-activity/y/marcpage/scheduling?style=flat)]()
+[![example workflow](https://github.com/marcpage/scheduling/actions/workflows/CI.yml/badge.svg)](https://github.com/marcpage/scheduling/actions/workflows/CI.yml) [![Issues](https://img.shields.io/github/issues-raw/marcpage/scheduling?maxAge=25000)](https://github.com/marcpage/scheduling/issues)  [![GitHub pull requests](https://img.shields.io/github/issues-pr/marcpage/scheduling?style=flat)](https://github.com/marcpage/scheduling/pulls) [![PR's Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com) [![GitHub contributors](https://img.shields.io/github/contributors/marcpage/scheduling?style=flat)](https://github.com/marcpage/scheduling/graphs/contributors)  [![GitHub commit activity the past week, 4 weeks](https://img.shields.io/github/commit-activity/y/marcpage/scheduling?style=flat)](https://github.com/marcpage/scheduling/pulse)
 
-[![GitHub stars](https://img.shields.io/github/stars/marcpage/scheduling?style=social&label=Star)](https://github.com/JonSnow/MyBadges)
-[![GitHub watchers](https://img.shields.io/github/watchers/marcpage/scheduling?style=social&label=Watch)](https://github.com/JonSnow/MyBadges)
-[![GitHub forks](https://img.shields.io/github/forks/marcpage/scheduling?style=social&label=Fork)](https://github.com/JonSnow/MyBadges)
-[![GitHub followers](https://img.shields.io/github/followers/scheduling?style=social&label=Follow)](https://github.com/JonSnow/MyBadges)  
+[![GitHub stars](https://img.shields.io/github/stars/marcpage/scheduling?style=social&label=Star)](https://github.com/marcpage/scheduling/stargazers)
+[![GitHub watchers](https://img.shields.io/github/watchers/marcpage/scheduling?style=social&label=Watch)](https://github.com/marcpage/scheduling/watchers)
+[![GitHub forks](https://img.shields.io/github/forks/marcpage/scheduling?style=social&label=Fork)](https://github.com/marcpage/scheduling/network/members)
 
 # Staff Scheduling
 Restaurant staff scheduling website

@@ -4,18 +4,29 @@
 """
 
 import argparse
-import os
-import time
 import datetime
+import os
+import platform
+import time
 
 from flask import Flask, render_template, request, redirect, make_response
 
 import model
+import tests.prepopulate
 
 # TODO: template # pylint: disable=W0511
-STORAGE_PATH = os.path.join(
-    os.environ["HOME"], "Library", "Preferences", "scheduling.sqlite3"
-)
+
+if platform.system() == "Darwin":
+    STORAGE_PATH = os.path.join(
+        os.environ["HOME"], "Library", "Preferences", "scheduling.sqlite3"
+    )
+elif platform.system() == "Linux":
+    STORAGE_PATH = os.path.join(os.environ["HOME"], ".scheduling.sqlite3")
+elif platform.system() == "Windows":
+    STORAGE_PATH = os.path.join(os.environ["APPDATA"], "scheduling.sqlite3")
+else:
+    STORAGE_PATH = os.path.join(".scheduling.sqlite3")
+
 STORAGE = "sqlite:///" + STORAGE_PATH
 USER_ID_COOKIE = "session"
 MAXIMUM_FUTURE_DATE_IN_SECONDS = 1 * 365 * 24 * 60 * 60.0
@@ -42,7 +53,12 @@ def convert_from_html_time(html_time):
 def create_app(storage_url, source_dir, template_dir):
     # pylint: disable=R0914,R0915
     """create the flask app"""
-    app = Flask(__name__, static_folder=source_dir, template_folder=template_dir)
+    app = Flask(
+        __name__,
+        static_url_path="",
+        static_folder=source_dir,
+        template_folder=template_dir,
+    )
     database = model.Database(storage_url)
 
     # Mark: Root
@@ -298,6 +314,9 @@ def parse_args():
         "-s", "--storage", default=STORAGE, help="SqlAlchemy url to store information"
     )
     parser.add_argument(
+        "-t", "--test", action="store_true", help="Preload data into the database"
+    )
+    parser.add_argument(
         "-u",
         "--ui",
         type=str,
@@ -314,6 +333,8 @@ def main():
     """Entry point. Loop forever unless we are told not to."""
 
     args = parse_args()
+    if args.test:
+        tests.prepopulate.load(args.storage)
     app = create_app(args.storage, args.ui, os.path.join(args.ui, "template"))
     app.run(host="0.0.0.0", debug=args.debug, port=args.port)
 

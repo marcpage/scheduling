@@ -8,14 +8,13 @@
     <link rel="shortcut icon" href="w.ico" type="image/x-icon">
 </head>
 <body>
-    <nav><a href="/logout.html">Logout</a><br/></nav>
-    
-    <h1 id="wel">Welcome {{ user.name }}</h1>
-        
-    
+        <h1 id="wel">Welcome {{ user.name }}</h1>
+        <a href="/logout">logout</a><br/>
+
         {% if user.admin %}
+<!--  ==================== Admin ====================  -->
             Hey, admin.
-    
+
             <h2 id="cr">Create Restaurant</h2>
             <form action="/create_restaurant" method="POST">
                 <input name="name"
