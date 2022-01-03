@@ -45,27 +45,6 @@
             <input type="submit" value="add"/>
         </form>
 
-        {% if user_roles %}
-            <form action="/set_role_priority" method="POST">
-                <input type="hidden" name="restaurant_id" value="{{ restaurant.id }}">
-                <ul>
-                    {% for preference in user_roles %}
-                        <li>
-                            <input type="number"
-                                name="{{ preference.id }}_gm_priority"
-                                value="{{ preference.gm_priority }}"
-                                min=1
-                                max=100
-                                step=1/>
-                            {{ preference.role.name }}
-                            {{ preference.user.name }}
-                        </li>
-                    {% endfor %}
-                </ul>
-                <input type="submit" value="change role priority"/>
-            </form>
-        {% endif %}
-
         <h2>Shifts</h2>
         <form action="/restaurant/{{ restaurant.id }}/add_shift" method="POST">
             <select
@@ -135,32 +114,41 @@
         {% endfor %}
         </ul>
 
+        <h2>Employees</h2>
+
+        <ul>
+        {% for employee in employees %}
+            <li> {{ employee.name }} {{ employee.email }} </li>
+        {% endfor %}
+        </ul>
+
+        {% if user_roles %}
+            <h2>The priority order for each employee in each role</h2>
+            <form action="/set_role_priority" method="POST">
+                <input type="hidden" name="restaurant_id" value="{{ restaurant.id }}">
+                <ul>
+                    {% for preference in user_roles %}
+                        <li>
+                            <input type="number"
+                                name="{{ preference.id }}_gm_priority"
+                                value="{{ preference.gm_priority }}"
+                                min=1
+                                max=100
+                                step=1/>
+                            {{ preference.role.name }}
+                            {{ preference.user.name }}
+                        </li>
+                    {% endfor %}
+                </ul>
+                <input type="submit" value="change role priority"/>
+            </form>
+        {% endif %}
+
     {% elif user and user_restaurant_roles %}
 <!--  ==================== Employee ====================  -->
 
         <a href="/logout">logout</a><br/>
         Welcome, {{ user.name }}.
-
-        <p>Please make sure these are ordered in your order of preference.</p>
-        {% if user_restaurant_roles %}
-        <form action="/set_role_priority" method="POST">
-            <input type="hidden" name="restaurant_id" value="{{ restaurant.id }}">
-            <ul>
-                {% for role in user_restaurant_roles %}
-                    <li>
-                        <input type="number"
-                            name="{{ role.id }}_priority"
-                            value="{{ role.priority }}"
-                            min=1
-                            max=100
-                            step=1/>
-                        {{ role.role.name }}
-                    </li>
-                {% endfor %}
-            </ul>
-            <input type="submit" value="change role priority"/>
-        </form>
-        {% endif %}
 
         <p>Add general availability</p>
         <form action="/restaurant/{{ restaurant.id }}/add_availability" method="POST">
@@ -236,6 +224,28 @@
             {% endif %}
         {% endfor %}
         </ul>
+
+        {% if user_restaurant_roles %}
+        <h2>Shift-Employee Preferences</h2>
+        <p>Please make sure these are ordered in your order of preference.</p>
+        <form action="/set_role_priority" method="POST">
+            <input type="hidden" name="restaurant_id" value="{{ restaurant.id }}">
+            <ul>
+                {% for role in user_restaurant_roles %}
+                    <li>
+                        <input type="number"
+                            name="{{ role.id }}_priority"
+                            value="{{ role.priority }}"
+                            min=1
+                            max=100
+                            step=1/>
+                        {{ role.role.name }}
+                    </li>
+                {% endfor %}
+            </ul>
+            <input type="submit" value="change role priority"/>
+        </form>
+        {% endif %}
 
     {% elif user %}
 <!--  ==================== Logged non-employee ====================  -->

@@ -12,6 +12,10 @@ RESTAURANTS = [
     {'name': "Taco Bell", "gm": "michael@restaurant.com"},
 ]
 
+ROLES = [
+    'Dishwasher', 'Busser', 'Server', 'Phones', 'Phones', 'Cashier', 'Prep', 'Open', 'Close', 'Manager', 'Alcohol (18)'
+]
+
 def load(storage_url):
     database = model.Database(storage_url)
 
@@ -25,6 +29,15 @@ def load(storage_url):
         if not already_exists:
             restaurant_entry = database.create_restaurant(restaurant['name'])
             restaurant_entry.gm_id = database.find_user(restaurant['gm']).id
+
+            for role in ROLES:
+                database.create_role(restaurant_entry.id, role)
+
+            for user_info in USERS:
+                user = database.find_user(user_info['email'])
+                if restaurant_entry.gm_id != user.id:
+                    database.add_user_to_restaurant(user, restaurant_entry)
+
 
     database.close()
 

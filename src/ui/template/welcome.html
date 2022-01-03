@@ -38,17 +38,11 @@
             {% endfor %}
             </ul>
 
-            <h2 id="res">Restaurants</h2>
-            <ul>
-            {% for restaurant in restaurant_list %}
-                <li><a href="/restaurant/{{ restaurant.id }}">{{ restaurant.name }}</a>
-                    (GM: {{ restaurant.gm }})</li>
-            {% endfor %}
-            </ul>
-
             Session ages: {{ sessions }}
         {% endif %}
 
+<!--  ==================== Everyone ====================  -->
+        <h2 id="res">Restaurants</h2>
         <ul>
         {% for restaurant in restaurant_list %}
             <li><a href="/restaurant/{{ restaurant.id }}">{{ restaurant.name }}</a></li>
