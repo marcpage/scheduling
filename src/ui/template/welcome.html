@@ -25,15 +25,19 @@
                         size=25
                         title="The Restaurant Name"
                         requred autofocus />
+
                 <input type="submit" id="createbtn"  value="Create"/>
             </form>
+                <input type="submit" value="create"/>
+            </form>
+
+
             <h2 id="user">Users</h2>
             <ul>
             {% for user in user_list %}
                 <li>{{ user.name }} ({{ user.email }})</li>
             {% endfor %}
             </ul>
-    
             <h2 id="res">Restaurants</h2>
             <ul>
             {% for restaurant in restaurant_list %}
@@ -41,16 +45,15 @@
                     (GM: {{ restaurant.gm }})</li>
             {% endfor %}
             </ul>
-    
+
             Session ages: {{ sessions }}
         {% endif %}
     
-        <ul>
+<ul>
         {% for restaurant in restaurant_list %}
             <li><a href="/restaurant/{{ restaurant.id }}">{{ restaurant.name }}</a></li>
         {% endfor %}
         </ul>
-    
     <style>
         #wel,#res,#user,#cr{
             font-family: Arial, Helvetica, sans-serif;

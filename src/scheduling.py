@@ -197,7 +197,7 @@ def create_app(storage_url, source_dir, template_dir):
         """adds user availability for a restaurant"""
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         restaurant = database.get_restaurant(restaurant_id)
-        day_of_week = request.form["day_of_week"]
+        day_of_week = int(request.form["day_of_week"])
         priority = request.form["priority"]
         start_date = convert_from_html_date(request.form["start_date"])
         end_date = convert_from_html_date(request.form["end_date"])
@@ -217,6 +217,32 @@ def create_app(storage_url, source_dir, template_dir):
             end_time=end_time,
             priority=priority,
             note=note if note else None,
+        )
+
+        return redirect(f"/restaurant/{restaurant_id}")
+
+    @app.route("/restaurant/<restaurant_id>/add_shift", methods=["POST"])
+    def add_restaurant_shift(restaurant_id):
+        """adds shifts to a restaurant"""
+        user = database.get_user(request.cookies.get(USER_ID_COOKIE))
+        restaurant = database.get_restaurant(restaurant_id)
+        if user is None or restaurant is None:
+            return (render_template("404.html", path="???"), 404)
+        day_of_week = int(request.form["day_of_week"])
+        start_time = convert_from_html_time(request.form["start_time"])
+        end_time = convert_from_html_time(request.form["end_time"])
+        priority = request.form["priority"]
+        start_date = convert_from_html_date(request.form["start_date"])
+        end_date = convert_from_html_date(request.form["end_date"])
+
+        database.create_shift(
+            restaurant=restaurant,
+            day_of_week=day_of_week,
+            start_date=start_date,
+            start_time=start_time,
+            end_date=end_date,
+            end_time=end_time,
+            priority=priority,
         )
 
         return redirect(f"/restaurant/{restaurant_id}")
@@ -277,6 +303,9 @@ def create_app(storage_url, source_dir, template_dir):
             else []
         )
         user_restaurant_roles.sort(key=lambda r: r.priority)
+        employees_by_id = {
+            p.user.id: p.user for r in found.roles for p in r.preferences
+        }
         return render_template(
             "restaurant.html",
             restaurant=found,
@@ -285,6 +314,7 @@ def create_app(storage_url, source_dir, template_dir):
             user_roles=gm_user_roles,
             user_restaurant_roles=user_restaurant_roles,
             today=time.strftime("%Y-%m-%d"),
+            employees=list(employees_by_id.values()),
             latest_date=time.strftime(
                 "%Y-%m-%d", time.localtime(time.time() + MAXIMUM_FUTURE_DATE_IN_SECONDS)
             ),
