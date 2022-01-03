@@ -110,6 +110,21 @@
                 end_date={{ shift.end_date}}
                 start_time={{ shift.start_time }}
                 end_time={{ shift.end_time}}
+                <ul>
+                {% for role in shift.roles %}
+                    <li>{{ role.name }}</li>
+                {% endfor %}
+                </ul>
+                <form action="/restaurant/{{ restaurant.id }}/shift/{{ shift.id }}/add_role" method="POST">
+                    <select
+                        title="Role"
+                        name="role_id">
+                        {% for role in restaurant.roles %}
+                            <option value="{{ role.id }}">{{ role.name }}</option>
+                        {% endfor %}
+                        <input type="submit" value="add role to shift"/>
+                    </select>
+                </form>
             </li>
         {% endfor %}
         </ul>

@@ -247,6 +247,42 @@ def create_app(storage_url, source_dir, template_dir):
 
         return redirect(f"/restaurant/{restaurant_id}")
 
+    @app.route(
+        "/restaurant/<restaurant_id>/shift/<shift_id>/add_role", methods=["POST"]
+    )
+    def add_restaurant_shift_role(restaurant_id, shift_id):
+        """adds shifts to a restaurant"""
+        user = database.get_user(request.cookies.get(USER_ID_COOKIE))
+        restaurant = database.get_restaurant(restaurant_id)
+        shifts = [s for s in restaurant.shifts if s.id == int(shift_id)]
+        role_id = int(request.form["role_id"])
+        roles = [r for r in restaurant.roles if r.id == role_id]
+        print(
+            [
+                "shift_id",
+                shift_id,
+                "user",
+                user,
+                "restaurant",
+                restaurant,
+                "shifts",
+                shifts,
+                "role_id",
+                role_id,
+                "roles",
+                roles,
+            ]
+        )
+        print(["restaurant.shifts", restaurant.shifts])
+        print(["restaurant.roles", restaurant.roles])
+        if user is None or restaurant is None or not shifts or not roles:
+            return (render_template("404.html", path="???"), 404)
+        shift = shifts[0]  # TODO: assert only one shift # pylint: disable=W0511
+        role = roles[0]  # TODO: assert only one role # pylint: disable=W0511
+        shift.roles.append(role)
+        database.flush()
+        return redirect(f"/restaurant/{restaurant_id}")
+
     # Mark: Actual websites
 
     @app.route("/welcome")
