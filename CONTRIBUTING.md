@@ -33,7 +33,7 @@ This issue has details on how to run the various steps manually.
 
 You can view the [current model in use](https://dbdiagram.io/d/61d258173205b45b73d415fc).
 
-<img width="710" alt="Screen Shot 2022-01-03 at 9 26 42 AM" src="https://user-images.githubusercontent.com/695749/147948643-540d4573-309d-47d7-ac96-a1680be02e9b.png">
+<img width="929" alt="Screen Shot 2022-01-03 at 4 16 51 PM" src="https://user-images.githubusercontent.com/695749/147986464-929528c8-1507-4774-a900-4530bbca44a5.png">
 
 ## Notes to refer to when adding to this document
 
