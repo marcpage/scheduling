@@ -29,6 +29,10 @@ On Linux and macOS, you can just run `./pr_build.sh` which will validate your so
 **Note:** [Issue #40](https://github.com/marcpage/scheduling/issues/40) is available to create a pr_build.bat for Windows to do similar behavior.
 This issue has details on how to run the various steps manually.
 
+## Model documentation
+
+You can view the [current model in use](https://dbdiagram.io/d/61d258173205b45b73d415fc).
+
 ## Notes to refer to when adding to this document
 
 These are notes for me to add more information to this document.
