@@ -20,20 +20,33 @@
                 <input name="name"
                         type="text"
                         minlength=5
+<<<<<<< HEAD
                         id="resname"
+=======
+>>>>>>> main
                         placeholder="Restaurant Name"
                         size=25
                         title="The Restaurant Name"
                         requred autofocus />
+<<<<<<< HEAD
                 <input type="submit" id="createbtn"  value="Create"/>
             </form>
+=======
+                <input type="submit" value="create"/>
+            </form>
+
+>>>>>>> main
             <h2 id="user">Users</h2>
             <ul>
             {% for user in user_list %}
                 <li>{{ user.name }} ({{ user.email }})</li>
             {% endfor %}
             </ul>
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> main
             <h2 id="res">Restaurants</h2>
             <ul>
             {% for restaurant in restaurant_list %}
@@ -41,15 +54,23 @@
                     (GM: {{ restaurant.gm }})</li>
             {% endfor %}
             </ul>
+<<<<<<< HEAD
     
             Session ages: {{ sessions }}
         {% endif %}
     
+=======
+
+            Session ages: {{ sessions }}
+        {% endif %}
+
+>>>>>>> main
         <ul>
         {% for restaurant in restaurant_list %}
             <li><a href="/restaurant/{{ restaurant.id }}">{{ restaurant.name }}</a></li>
         {% endfor %}
         </ul>
+<<<<<<< HEAD
     
     <style>
         #wel,#res,#user,#cr{
@@ -66,5 +87,8 @@
             font-size: 15px;
         }
     </style>
+=======
+
+>>>>>>> main
     </body>
 </html>
