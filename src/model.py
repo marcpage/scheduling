@@ -150,6 +150,7 @@ class UserRolePreference(Alchemy_Base):  # pylint: disable=R0903
 # R0903: Too few public methods (0/2) (too-few-public-methods)
 class UserLimits(Alchemy_Base):  # pylint: disable=R0903
     """The GM's notes and hours limit for an employee
+    restaurant_id - The restaurant for these limits
     user_id / user - The employee
     hours_limit - The maximum number of hours to schedule an employee
     notes - GM's notes about the employee
