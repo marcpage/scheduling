@@ -6,4 +6,6 @@ h1{
 body{
     background-image: url("error404.png");
     background-size: cover;
+    background-repeat: no-repeat;
+
 }

@@ -209,6 +209,7 @@ def create_app(storage_url, source_dir, template_dir):
 
     @app.route("/welcome")
     def welcome():
+        
         """Fetches Employee from database"""
         user = database.get_user(request.cookies.get(USER_ID_COOKIE))
         admin_user = user.admin if user is not None else False
@@ -318,4 +319,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main.run(debug = True)
+    # main()

@@ -5,31 +5,17 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Login</title>
+        <script src="index.js"></script>
 </head>
 <body>
         <form method='POST' action="/login">
-                <h1 id="loginhead">LOGIN</h1>
-                <input name="email"
-                        type="text"
-                        minlength=5
-                        id="email"
-                        placeholder="Email Address"
-                        size=25
-                        pattern="[^@ \t\r\n]+@[^@]+\.[^@]+"
-                        title="your email address"
-                        required autofocus /><br><br>
-                <input name="password"
-                        type="password"
-                        id="pass"
-                        minlength=5
-                        placeholder="Password"
-                        size=25
-                        title="your password"
-                        required /><br><br>
-                <input type="reset" id = "resetbtn" placeholder="Reset">
-                <input type="submit" id = "loginbtn" value="Login"/>
+        <h1 id="loginhead">LOGIN</h1>
+        <input name="email" type="text" minlength=5 id="email" placeholder="Email Address" size=25pattern="[^@ \t\r\n]+@[^@]+\.[^@]+" title="your email address" required autofocus /><br><br>
+        <input name="password" type="password" id="pass" minlength=5  placeholder="Password" size=25 title="your password" required /><br><br>
+        <input type="reset" id = "resetbtn" placeholder="Reset">
+        <input type="submit"onclick="login()" id = "loginbtn" value="Login"/>
         </form>
-        <style>
+<style>
                 form{
                         text-align: center;
                         
@@ -53,6 +39,7 @@
                         font-family: Arial, Helvetica, sans-serif;
                         font-size: 50px;
                 }
-        </style>
+</style>
+
 </body>
 </html>

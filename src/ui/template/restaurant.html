@@ -1,19 +1,28 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant</title>
+    <link rel="shortcut icon" href="favicon r.ico" type="image/x-icon">
+</head>
 <body>
-<h1>{{ restaurant.name }}</h1>
+</head>
+<h1 id="heading">{{ restaurant.name }}</h1>
 
     {% if user.admin %}
 <!--  ==================== Admin ====================  -->
 
-        <a href="/logout">logout</a><br/>
-        General Manager: {{ restaurant.gm }}
+        <a href="/logout">Logout</a><br/>
+        <h3>General Manager: {{ restaurant.gm }}</h3>
 
         <form action="/restaurant/{{ restaurant.id }}/set_gm" method="POST">
             <select name="gm_id">
                 {% for user in user_list %}
                     <option value="{{ user.id }}"
                         {% if restaurant.gm
-                            and restaurant.gm.id == user.id%} selected{% endif %}>{{ user.name }} ({{ user.email }})</li>
+                            and restaurant.gm.id == user.id%} selected{% endif %}>{{user.name}} ({{ user.email }})</li>
                 {% endfor %}
             </select>
             <input type="submit" value="set"/>
@@ -23,7 +32,7 @@
     {% elif user.id == restaurant.gm_id %}
 <!--  ==================== GM ====================  -->
 
-        <a href="/logout">logout</a><br/>
+        <a href="/logout">Logout</a><br/>
         Welcome, {{ user.name }}
 
         <h2>Roles</h2>
@@ -32,17 +41,18 @@
             <li>{{ role.name }}</li>
         {% endfor %}
         </ul>
-        Add roles in the order new employees normally progress.
+        <h3>Add Roles in the order New Employees normally progress.</h3>
         <form action="/restaurant/{{ restaurant.id }}/add_role" method="POST">
             <input name="name"
                     type="text"
                     minlength=3
                     placeholder="Role"
                     size=10
+                    id="roleinput"
                     title="Name of the role"
                     pattern=".{3,}"
-                    requred autofocus />
-            <input type="submit" value="add"/>
+                    required autofocus />
+            <input type="submit" id="addbtn" value="Add"/>
         </form>
 
         {% if user_roles %}
@@ -54,6 +64,7 @@
                             <input type="number"
                                 name="{{ preference.id }}_gm_priority"
                                 value="{{ preference.gm_priority }}"
+                                id="preference_role"
                                 min=1
                                 max=100
                                 step=1/>
@@ -62,15 +73,15 @@
                         </li>
                     {% endfor %}
                 </ul>
-                <input type="submit" value="change role priority"/>
+                <input type="submit" id = "cpr" value="Change Role Priority"/>
             </form>
         {% endif %}
 
     {% elif user and user_restaurant_roles %}
 <!--  ==================== Employee ====================  -->
 
-        <a href="/logout">logout</a><br/>
-        Welcome, {{ user.name }}.
+        <br><a href="/logout">Logout</a><br/>
+        <h2>Welcome, {{ user.name }}.</h2>
 
         <p>Please make sure these are ordered in your order of preference.</p>
         {% if user_restaurant_roles %}
@@ -89,12 +100,12 @@
                     </li>
                 {% endfor %}
             </ul>
-            <input type="submit" value="change role priority"/>
+            <input type="submit" value="Change Role Priority"/>
         </form>
         {% endif %}
 
-        <p>Add general availability</p>
-        <form action="/restaurant/{{ restaurant.id }}/add_availability" method="POST">
+        <h2>Add general availability</h2>
+        <form id="ada"  action="/restaurant/{{ restaurant.id }}/add_availability" method="POST">
             <select
                 title="Day of the week"
                 name="day_of_week">
@@ -136,7 +147,7 @@
                     size=8
                     pattern="\d\d?:\d\d [AaPp][mM]"
                     title="Start time"
-                    requred/>
+                    required/>
             -
             <input name="end_time"
                     type="text"
@@ -145,11 +156,11 @@
                     size=8
                     pattern="\d\d?:\d\d [AaPp][mM]"
                     title="End time"
-                    requred/>
+                    required/>
             <br/>
             <textarea name="note" rows="4" cols="50" placeholder="Notes for scheduler if needed"></textarea>
             <br/>
-            <input type="submit" value="add availability"/>
+            <input type="submit" id="addavail" value="Add Availability"/>
         </form>
 
         <ul>
@@ -171,7 +182,7 @@
     {% elif user %}
 <!--  ==================== Logged non-employee ====================  -->
 
-        <a href="/logout">logout</a><br/>
+        <a href="/logout">Logout</a><br/>
         Welcome, {{ user.name }}. You have been invited to join our team.
 
         Add user to restaurant
@@ -180,35 +191,88 @@
     {% else %}
 <!--  ==================== Not logged in ====================  -->
 
-        Welcome, you have been invited to join the {{ restaurant.name }} family.
-        <form action="/create_user" method="POST">
+        <h3>Welcome, you have been invited to join the {{ restaurant.name }} family.</h3>
+        <form id="create_user" action="/create_user" method="POST">
             <input name="name"
                     type="text"
                     minlength=5
-                    placeholder="first and last name"
+                    placeholder="Your Name"
                     size=25
+                    id="name"
                     title="your name"
-                    requred autofocus /><br/>
+                    required autofocus /><br/><br>
             <input name="email"
                     type="text"
                     minlength=5
-                    placeholder="email address"
+                    placeholder="Email Address"
                     size=25
+                    id="email"
                     pattern="[^@ \t\r\n]+@[^@]+\.[^@]+"
                     title="your email address"
-                    requred /><br/>
+                    required /><br/><br>
             <input name="password"
                     type="password"
                     minlength=5
-                    placeholder="password"
+                    placeholder="Password"
                     size=25
+                    id="passw"
                     title="your password"
-                    requred />
-            <input type="hidden" name="restaurant_id" value="{{ restaurant.id }}"/>
-            <input type="submit" value="join"/>
+                    required /><br>
+            <input type="hidden" name="restaurant_id" value="{{ restaurant.id }}"/><br>
+            <input type="submit" id="joinbtn" value="Join"/>
         </form>
 
     {% endif %}
 
+<style>
+    #heading{
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+        
+    }
+    body{
+        font-family: Arial, Helvetica, sans-serif;
+    }
+    #roleinput{
+        width: 10em;
+        height: 2.5em;
+        font-size: 15px;
+        text-align: center;
+        
+    }
+
+    #addbtn,#joinbtn{
+        width: 4.2em;
+        height: 2em;
+        font-size: 15px;
+    }
+    #name,#email,#passw{
+        font-size: 15px;
+        width: 12em;
+        height: 2.5em;
+        margin-left: 60px;
+    }
+    #addavail{
+        width: 12em;
+        font-size: 20px;
+        height: 3em;
+        margin-left: 50px;
+    }
+    #ada{  /*Add Aviailability*/
+        margin-left: 50px;
+        
+    }
+    #cpr{ /*change role priority*/
+        width: 10em;
+        height: 3em;
+        font-size: 15px;
+        font: bolder;
+    }
+    #preference_role{
+        width: 8em;
+        height: 2.1em;
+
+    }
+</style>
 </body>
 </html>
