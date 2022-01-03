@@ -35,12 +35,30 @@ class Date(sqlalchemy.types.TypeDecorator):  # pylint: disable=W0223
 Alchemy_Base = sqlalchemy.ext.declarative.declarative_base()
 
 
-shift_roles = sqlalchemy.Table(
-    "shift_roles",
-    Alchemy_Base.metadata,
-    sqlalchemy.Column("role_id", sqlalchemy.ForeignKey("role.id")),
-    sqlalchemy.Column("shift_id", sqlalchemy.ForeignKey("shift.id")),
-)
+# R0903: Too few public methods (0/2) (too-few-public-methods)
+class ShiftRole(Alchemy_Base):  # pylint: disable=R0903
+    """How many people of a given role are needed for a given shift.
+    role_id / role - The role for the shift
+    shift_id / shift - The shift
+    number - the number of people of this role needed for this shift
+    """
+
+    __tablename__ = "shift_roles"
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    role_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("role.id"))
+    role = sqlalchemy.orm.relationship("Role")
+    shift_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("shift.id"))
+    shift = sqlalchemy.orm.relationship("Shift")
+    number = sqlalchemy.Column(sqlalchemy.Integer)
+
+    def __repr__(self):
+        """display string"""
+        return (
+            f"Shift(id={self.id} "
+            + f'role="{self.role}" '
+            + f'shift="{self.shift}" '
+            + f'number="{self.number}")'
+        )
 
 
 # R0903: Too few public methods (0/2) (too-few-public-methods)
@@ -68,11 +86,11 @@ class Shift(Alchemy_Base):  # pylint: disable=R0903
     priority = sqlalchemy.Column(sqlalchemy.Float)
     start_date = sqlalchemy.Column(sqlalchemy.DateTime)
     end_date = sqlalchemy.Column(sqlalchemy.DateTime)
-    roles = sqlalchemy.orm.relationship("Role", secondary=shift_roles)
+    roles = sqlalchemy.orm.relationship("ShiftRole", viewonly=True)
 
     def __repr__(self):
         """display string"""
-        roles = ", ".join([r.name for r in self.roles])
+        roles = ", ".join([f"{r.role.name} x {r.number}" for r in self.roles])
         return (
             f"Shift(id={self.id} "
             + f'day="{self.day_of_week}" '
@@ -81,7 +99,7 @@ class Shift(Alchemy_Base):  # pylint: disable=R0903
             + f"priority={self.priority} "
             + f"start date={self.start_date} "
             + f"end date={self.end_date} "
-            + f'roles="{roles}")'
+            + f"roles={roles} "
         )
 
 
@@ -477,3 +495,23 @@ class Database:
                 priority=kwargs["priority"],
             )
         )
+
+    def add_role_to_shift(self, shift, role, number=1):
+        """Add roles to a shift"""
+        shift_role = (
+            self.__session()
+            .query(ShiftRole)
+            .filter(
+                sqlalchemy.and_(
+                    ShiftRole.shift_id == shift.id, ShiftRole.role_id == role.id
+                )
+            )
+            .one_or_none()
+        )
+        if shift_role is not None:
+            shift_role.number += number
+        else:
+            shift_role = self.__add(
+                ShiftRole(role_id=role.id, shift_id=shift.id, number=number)
+            )
+        return shift_role
