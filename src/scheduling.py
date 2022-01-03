@@ -302,6 +302,9 @@ def create_app(storage_url, source_dir, template_dir):
             else []
         )
         user_restaurant_roles.sort(key=lambda r: r.priority)
+        employees_by_id = {
+            p.user.id: p.user for r in found.roles for p in r.preferences
+        }
         return render_template(
             "restaurant.html",
             restaurant=found,
@@ -310,6 +313,7 @@ def create_app(storage_url, source_dir, template_dir):
             user_roles=gm_user_roles,
             user_restaurant_roles=user_restaurant_roles,
             today=time.strftime("%Y-%m-%d"),
+            employees=list(employees_by_id.values()),
             latest_date=time.strftime(
                 "%Y-%m-%d", time.localtime(time.time() + MAXIMUM_FUTURE_DATE_IN_SECONDS)
             ),

@@ -46,7 +46,7 @@ default_shift_roles = sqlalchemy.Table(
 # R0903: Too few public methods (0/2) (too-few-public-methods)
 class Shift(Alchemy_Base):  # pylint: disable=R0903
     """Shifts to be scheduled during a date range
-    restaurant_id - The restaurant for this shift
+    restaurant_id / restaurant - The restaurant for this shift
     day_of_week - The day of the week 0 = Monday
     start_time - The number of minutes since midnight that the shift starts
     end_time - The number of minutes since midnight that the shift ends
@@ -61,6 +61,7 @@ class Shift(Alchemy_Base):  # pylint: disable=R0903
     restaurant_id = sqlalchemy.Column(
         sqlalchemy.Integer, sqlalchemy.ForeignKey("restaurant.id")
     )
+    restaurant = sqlalchemy.orm.relationship("Restaurant")
     day_of_week = sqlalchemy.Column(sqlalchemy.Integer)
     start_time = sqlalchemy.Column(sqlalchemy.Integer)
     end_time = sqlalchemy.Column(sqlalchemy.Integer)
