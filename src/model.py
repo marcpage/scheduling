@@ -35,7 +35,7 @@ class Date(sqlalchemy.types.TypeDecorator):  # pylint: disable=W0223
 Alchemy_Base = sqlalchemy.ext.declarative.declarative_base()
 
 
-default_shift_roles = sqlalchemy.Table(
+shift_roles = sqlalchemy.Table(
     "shift_roles",
     Alchemy_Base.metadata,
     sqlalchemy.Column("role_id", sqlalchemy.ForeignKey("role.id")),
@@ -68,7 +68,7 @@ class Shift(Alchemy_Base):  # pylint: disable=R0903
     priority = sqlalchemy.Column(sqlalchemy.Float)
     start_date = sqlalchemy.Column(sqlalchemy.DateTime)
     end_date = sqlalchemy.Column(sqlalchemy.DateTime)
-    roles = sqlalchemy.orm.relationship("Role", secondary=default_shift_roles)
+    roles = sqlalchemy.orm.relationship("Role", secondary=shift_roles)
 
     def __repr__(self):
         """display string"""
