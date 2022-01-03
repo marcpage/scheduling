@@ -13,6 +13,8 @@ On Linux and macOS you can run `pr_build.sh` which will clean up your changes to
 
 **Please** make sure that your editor does not reformat the code (especially to force it into columns less than 100).
 
+## Pull request conventions
+
 Pull Requests should be single-topic and small. 
 If you are refactoring (or even reformatting), please do that as a single change with minimal other changes.
 The idea is to make Code Reviews as easy as possible. 
