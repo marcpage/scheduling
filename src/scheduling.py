@@ -352,8 +352,11 @@ def parse_args():
         default="ui",
         help="Path to the directory with ui files.",
     )
-    parser.add_argument("-d", "--debug", default=True, help="Run debug server.")
+    parser.add_argument("-d", "--debug", default=False, help="Run debug server.")
     args = parser.parse_args()
+
+    if args.test:
+        args.debug = True
 
     return args
 
