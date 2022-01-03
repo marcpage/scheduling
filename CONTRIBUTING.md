@@ -24,7 +24,7 @@ We want lots of small code reviews instead of a few giant code reviews.
 
 On Linux and macOS, you can just run `./pr_build.sh` which will validate your source. 
 `./prbuild.sh fix` will attempt to format your source correctly (`black`). 
-`.pr_build.sh run` will run the web server on the default port `8000`.
+`./pr_build.sh run` will run the web server on the default port `8000`.
 
 **Note:** [Issue #40](https://github.com/marcpage/scheduling/issues/40) is available to create a pr_build.bat for Windows to do similar behavior.
 
