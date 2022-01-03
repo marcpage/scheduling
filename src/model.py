@@ -36,16 +36,17 @@ Alchemy_Base = sqlalchemy.ext.declarative.declarative_base()
 
 
 default_shift_roles = sqlalchemy.Table(
-    "default_shift_roles",
+    "shift_roles",
     Alchemy_Base.metadata,
     sqlalchemy.Column("role_id", sqlalchemy.ForeignKey("role.id")),
-    sqlalchemy.Column("default_shift_id", sqlalchemy.ForeignKey("default_shift.id")),
+    sqlalchemy.Column("shift_id", sqlalchemy.ForeignKey("shift.id")),
 )
 
 
 # R0903: Too few public methods (0/2) (too-few-public-methods)
-class DefaultShift(Alchemy_Base):  # pylint: disable=R0903
-    """Default shifts to be scheduled during a date range
+class Shift(Alchemy_Base):  # pylint: disable=R0903
+    """Shifts to be scheduled during a date range
+    restaurant_id - The restaurant for this shift
     day_of_week - The day of the week 0 = Monday
     start_time - The number of minutes since midnight that the shift starts
     end_time - The number of minutes since midnight that the shift ends
@@ -55,8 +56,11 @@ class DefaultShift(Alchemy_Base):  # pylint: disable=R0903
     roles - The roles needed for the shift
     """
 
-    __tablename__ = "default_shift"
+    __tablename__ = "shift"
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
+    restaurant_id = sqlalchemy.Column(
+        sqlalchemy.Integer, sqlalchemy.ForeignKey("restaurant.id")
+    )
     day_of_week = sqlalchemy.Column(sqlalchemy.Integer)
     start_time = sqlalchemy.Column(sqlalchemy.Integer)
     end_time = sqlalchemy.Column(sqlalchemy.Integer)
@@ -69,7 +73,7 @@ class DefaultShift(Alchemy_Base):  # pylint: disable=R0903
         """display string"""
         roles = ", ".join([r.name for r in self.roles])
         return (
-            f"DefaultShift(id={self.id} "
+            f"Shift(id={self.id} "
             + f'day="{self.day_of_week}" '
             + f'start time="{self.start_time}" '
             + f"end time={self.end_time} "
@@ -77,46 +81,6 @@ class DefaultShift(Alchemy_Base):  # pylint: disable=R0903
             + f"start date={self.start_date} "
             + f"end date={self.end_date} "
             + f'roles="{roles}")'
-        )
-
-
-shift_roles = sqlalchemy.Table(
-    "shift_roles",
-    Alchemy_Base.metadata,
-    sqlalchemy.Column("role_id", sqlalchemy.ForeignKey("role.id")),
-    sqlalchemy.Column("shift_id", sqlalchemy.ForeignKey("shift.id")),
-)
-
-
-# R0903: Too few public methods (0/2) (too-few-public-methods)
-class Shift(Alchemy_Base):  # pylint: disable=R0903
-    """An instance of a specific shift
-    date - The date on which the shift occurs
-    start_time - The number of minutes since midnight that the shift starts
-    end_time - The number of minutes since midnight that the shift ends
-    priority - The GM's priority for filling this shift
-    notes - Notes for the GM on this shift for employees
-    roles - The roles to fill for for this shift
-    """
-
-    __tablename__ = "shift"
-    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
-    date = sqlalchemy.Column(sqlalchemy.DateTime)
-    start_time = sqlalchemy.Column(sqlalchemy.Integer)
-    end_time = sqlalchemy.Column(sqlalchemy.Integer)
-    priority = sqlalchemy.Column(sqlalchemy.Float)
-    note = sqlalchemy.Column(sqlalchemy.String(50))
-    roles = sqlalchemy.orm.relationship("Role", secondary=shift_roles)
-
-    def __repr__(self):
-        """display string"""
-        return (
-            f"Shift(id={self.id} "
-            + f'date="{self.date}" '
-            + f'start time="{self.start_time}" '
-            + f"end time={self.end_time} "
-            + f"priority={self.priority} "
-            + f'note="{self.note}")'
         )
 
 
@@ -294,6 +258,7 @@ class Restaurant(Alchemy_Base):  # pylint: disable=R0903
     gm_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"))
     gm = sqlalchemy.orm.relationship("User")
     roles = sqlalchemy.orm.relationship("Role", viewonly=True)
+    shifts = sqlalchemy.orm.relationship("Shift", viewonly=True)
 
     def __repr__(self):
         """display string"""
@@ -467,16 +432,6 @@ class Database:
             )
         )
 
-    # Mark: Role API
-
-    def create_role(self, restaurant_id, name):
-        """Create a new role for a restaurant"""
-        return (
-            self.__add(Role(name=name, restaurant_id=restaurant_id))
-            if len(name) > 0
-            else None
-        )
-
     # Mark: Restaurant API
 
     def create_restaurant(self, name):
@@ -499,3 +454,25 @@ class Database:
     def get_restaurants(self):
         """Get list of all restaurants"""
         return self.__session().query(Restaurant).all()
+
+    def create_role(self, restaurant_id, name):
+        """Create a new role for a restaurant"""
+        return (
+            self.__add(Role(name=name, restaurant_id=restaurant_id))
+            if len(name) > 0
+            else None
+        )
+
+    def create_shift(self, restaurant, day_of_week, **kwargs):
+        """Create a new shift"""
+        return self.__add(
+            Shift(
+                restaurant_id=restaurant.id,
+                day_of_week=day_of_week,
+                start_time=kwargs["start_time"],
+                end_time=kwargs["end_time"],
+                start_date=kwargs["start_date"],
+                end_date=kwargs["end_date"],
+                priority=kwargs["priority"],
+            )
+        )
