@@ -32,6 +32,7 @@ This issue has details on how to run the various steps manually.
 ## Model documentation
 
 You can view the [current model in use](https://dbdiagram.io/d/61d258173205b45b73d415fc).
+<img width="710" alt="Screen Shot 2022-01-03 at 9 26 42 AM" src="https://user-images.githubusercontent.com/695749/147948643-540d4573-309d-47d7-ac96-a1680be02e9b.png">
 
 ## Notes to refer to when adding to this document
 
