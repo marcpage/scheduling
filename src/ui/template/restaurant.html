@@ -41,7 +41,7 @@
                     size=10
                     title="Name of the role"
                     pattern=".{3,}"
-                    requred autofocus />
+                    required autofocus />
             <input type="submit" value="add"/>
         </form>
 
@@ -80,7 +80,7 @@
                     size=8
                     pattern="\d\d?:\d\d [AaPp][mM]"
                     title="Start time"
-                    requred/>
+                    required/>
             -
             <input name="end_time"
                     type="text"
@@ -89,7 +89,7 @@
                     size=8
                     pattern="\d\d?:\d\d [AaPp][mM]"
                     title="End time"
-                    requred/>
+                    required/>
             <br/>
             priority: <input type="number"
                 name="priority"
@@ -193,7 +193,7 @@
                     size=8
                     pattern="\d\d?:\d\d [AaPp][mM]"
                     title="Start time"
-                    requred/>
+                    required/>
             -
             <input name="end_time"
                     type="text"
@@ -202,7 +202,7 @@
                     size=8
                     pattern="\d\d?:\d\d [AaPp][mM]"
                     title="End time"
-                    requred/>
+                    required/>
             <br/>
             <textarea name="note" rows="4" cols="50" placeholder="Notes for scheduler if needed"></textarea>
             <br/>
@@ -267,7 +267,7 @@
                     placeholder="first and last name"
                     size=25
                     title="your name"
-                    requred autofocus /><br/>
+                    required autofocus /><br/>
             <input name="email"
                     type="text"
                     minlength=5
@@ -275,14 +275,14 @@
                     size=25
                     pattern="[^@ \t\r\n]+@[^@]+\.[^@]+"
                     title="your email address"
-                    requred /><br/>
+                    required /><br/>
             <input name="password"
                     type="password"
                     minlength=5
                     placeholder="password"
                     size=25
                     title="your password"
-                    requred />
+                    required />
             <input type="hidden" name="restaurant_id" value="{{ restaurant.id }}"/>
             <input type="submit" value="join"/>
         </form>
