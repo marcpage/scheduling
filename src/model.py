@@ -169,6 +169,7 @@ class ScheduledShift(Alchemy_Base):  # pylint: disable=R0903
     role_id / role - The role for this shift
     user_id / user - The employee scheduled
     draft - If not draft then it is published for employee to see
+    notes - Notes to the employee
     """
 
     __tablename__ = "scheduled_shift"
@@ -180,7 +181,8 @@ class ScheduledShift(Alchemy_Base):  # pylint: disable=R0903
     role = sqlalchemy.orm.relationship("Role")
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("user.id"))
     user = sqlalchemy.orm.relationship("User")
-    draft = sqlalchemy.Column(sqlalchemy.Boolean)
+    draft = sqlalchemy.Column(sqlalchemy.Boolean, default=True)
+    notes = sqlalchemy.Column(sqlalchemy.String(50))
 
     def __repr__(self):
         """display string"""
