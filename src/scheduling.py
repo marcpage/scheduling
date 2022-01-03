@@ -256,30 +256,13 @@ def create_app(storage_url, source_dir, template_dir):
         restaurant = database.get_restaurant(restaurant_id)
         shifts = [s for s in restaurant.shifts if s.id == int(shift_id)]
         role_id = int(request.form["role_id"])
-        roles = [r for r in restaurant.roles if r.id == role_id]
-        print(
-            [
-                "shift_id",
-                shift_id,
-                "user",
-                user,
-                "restaurant",
-                restaurant,
-                "shifts",
-                shifts,
-                "role_id",
-                role_id,
-                "roles",
-                roles,
-            ]
-        )
-        print(["restaurant.shifts", restaurant.shifts])
-        print(["restaurant.roles", restaurant.roles])
+        roles = [r for r in restaurant.roles if r.id == int(role_id)]
+        number = int(request.form["number"])
         if user is None or restaurant is None or not shifts or not roles:
             return (render_template("404.html", path="???"), 404)
         shift = shifts[0]  # TODO: assert only one shift # pylint: disable=W0511
         role = roles[0]  # TODO: assert only one role # pylint: disable=W0511
-        shift.roles.append(role)
+        database.add_role_to_shift(shift, role, number)
         database.flush()
         return redirect(f"/restaurant/{restaurant_id}")
 
