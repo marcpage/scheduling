@@ -67,7 +67,7 @@
         {% endif %}
 
         <h2>Shifts</h2>
-        <form action="/restaurant/{{ restaurant.id }}/add_default_shift">
+        <form action="/restaurant/{{ restaurant.id }}/add_shift" method="POST">
             <select
                 title="Day of the week"
                 name="day_of_week">
@@ -112,8 +112,28 @@
                     title="End time"
                     requred/>
             <br/>
+            priority: <input type="number"
+                name="priority"
+                value="1"
+                min=1
+                max=100
+                step=1/>
+            <br/>
             <input type="submit" value="add shift"/>
         </form>
+
+        <ul>
+        {% for shift in restaurant.shifts %}
+            <li>
+                day_of_week={{ shift.day_of_week }}
+                priority={{ shift.priority }}
+                start_date={{ shift.start_date }}
+                end_date={{ shift.end_date}}
+                start_time={{ shift.start_time }}
+                end_time={{ shift.end_time}}
+            </li>
+        {% endfor %}
+        </ul>
 
     {% elif user and user_restaurant_roles %}
 <!--  ==================== Employee ====================  -->
