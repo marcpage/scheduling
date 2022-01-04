@@ -1,4 +1,49 @@
 <html>
+<head>
+    <script>
+
+    {% if user.id == restaurant.gm_id %}
+        var employees = [
+            {% for employee in employees %}
+                {
+                    "name": "{{ employee.name }}",
+                    "id": {{ employee.id }},
+                    "email": "{{ employee.email }}",
+                    "hours_limit": {{ employee.hours_limit }},
+                    "role_preferences": {
+                        {% for preference in employee.roles %}
+                        {% if preference.role.restaurant_id == restaurant.id %}
+                            "{{ preference.role.name}}": {
+                                "priority": {{ preference.priority }},
+                                "gm_priority": {{ preference.gm_priority }}
+                            },
+                        {% endif %}
+                        {% endfor %}
+                    },
+                    "availability": [
+                        {% for availability in employee.availabilities %}
+                        {% if availability.restaurant.id == restaurant.id %}
+                            {
+                                "day_of_week": {{ availability.day_of_week}},
+                                "start_date": {{ availability.start_date }},
+                                "end_date": {{ availability.end_date }},
+                                "start_date": "{{ availability.start_date }}",
+                                "end_date": "{{ availability.end_date }}",
+                                "start_time" : {{ availability.start_time }},
+                                "end_time": {{ availability.end_time }},
+                                "priority": {{ availability.priority }},
+                                "note": {{ availability. note }}
+                            },
+                        {% endif %}
+                        {% endfor %}
+                    ]
+                },
+            {% endfor %}
+        ];
+    {% endif %}
+
+    </script>
+</head>
 <body>
 <h1>{{ restaurant.name }}</h1>
 
