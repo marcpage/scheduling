@@ -13,7 +13,7 @@ RESTAURANTS = [
 ]
 
 ROLES = [
-    'Dishwasher', 'Busser', 'Server', 'Phones', 'Phones', 'Cashier', 'Prep', 'Open', 'Close', 'Manager', 'Alcohol (18)'
+    'Dishwasher', 'Busser', 'Server', 'Phones', 'Cashier', 'Prep', 'Open', 'Close', 'Manager', 'Alcohol (18)'
 ]
 
 def load(storage_url):

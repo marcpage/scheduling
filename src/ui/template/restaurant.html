@@ -7,7 +7,53 @@
         <link rel="shortcut icon" href="r.ico" type="image/x-icon">
         <title>Restaurant</title>
     </head>
-    <body>
+   
+    <script>
+
+    {% if user.id == restaurant.gm_id %}
+        var employees = [
+            {% for employee in employees %}
+                {
+                    "name": "{{ employee.name }}",
+                    "id": {{ employee.id }},
+                    "email": "{{ employee.email }}",
+                    "hours_limit": {{ employee.hours_limit }},
+                    "role_preferences": {
+                        {% for preference in employee.roles %}
+                        {% if preference.role.restaurant_id == restaurant.id %}
+                            "{{ preference.role.name}}": {
+                                "priority": {{ preference.priority }},
+                                "gm_priority": {{ preference.gm_priority }}
+                            },
+                        {% endif %}
+                        {% endfor %}
+                    },
+                    "availability": [
+                        {% for availability in employee.availabilities %}
+                        {% if availability.restaurant.id == restaurant.id %}
+                            {
+                                "day_of_week": {{ availability.day_of_week}},
+                                "start_date": {{ availability.start_date }},
+                                "end_date": {{ availability.end_date }},
+                                "start_date": "{{ availability.start_date }}",
+                                "end_date": "{{ availability.end_date }}",
+                                "start_time" : {{ availability.start_time }},
+                                "end_time": {{ availability.end_time }},
+                                "priority": {{ availability.priority }},
+                                "note": {{ availability. note }}
+                            },
+                        {% endif %}
+                        {% endfor %}
+                    ]
+                },
+            {% endfor %}
+        ];
+    {% endif %}
+
+    </script>
+
+<body>
+
 <h1>{{ restaurant.name }}</h1>
 
     {% if user.admin %}
@@ -49,7 +95,7 @@
                     size=10
                     title="Name of the role"
                     pattern=".{3,}"
-                    requred autofocus />
+                    required autofocus />
             <input type="submit" value="add"/>
         </form>
 
@@ -88,7 +134,7 @@
                     size=8
                     pattern="\d\d?:\d\d [AaPp][mM]"
                     title="Start time"
-                    requred/>
+                    required/>
             -
             <input name="end_time"
                     type="text"
@@ -97,7 +143,7 @@
                     size=8
                     pattern="\d\d?:\d\d [AaPp][mM]"
                     title="End time"
-                    requred/>
+                    required/>
             <br/>
             priority: <input type="number"
                 name="priority"
@@ -118,6 +164,27 @@
                 end_date={{ shift.end_date}}
                 start_time={{ shift.start_time }}
                 end_time={{ shift.end_time}}
+                <ul>
+                {% for role in shift.roles %}
+                    <li>{{ role.number }} x {{ role.role.name }}</li>
+                {% endfor %}
+                </ul>
+                <form action="/restaurant/{{ restaurant.id }}/shift/{{ shift.id }}/add_role" method="POST">
+                    <select
+                        title="Role"
+                        name="role_id">
+                        {% for role in restaurant.roles %}
+                            <option value="{{ role.id }}">{{ role.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="number"
+                        name="number"
+                        value="1"
+                        min=1
+                        max=100
+                        step=1/>
+                    <input type="submit" value="add role to shift"/>
+                </form>
             </li>
         {% endfor %}
         </ul>
@@ -201,7 +268,7 @@
                     size=8
                     pattern="\d\d?:\d\d [AaPp][mM]"
                     title="Start time"
-                    requred/>
+                    required/>
             -
             <input name="end_time"
                     type="text"
@@ -210,7 +277,7 @@
                     size=8
                     pattern="\d\d?:\d\d [AaPp][mM]"
                     title="End time"
-                    requred/>
+                    required/>
             <br/>
             <textarea name="note" rows="4" cols="50" placeholder="Notes for scheduler if needed"></textarea>
             <br/>
@@ -275,7 +342,7 @@
                     placeholder="first and last name"
                     size=25
                     title="your name"
-                    requred autofocus /><br/>
+                    required autofocus /><br/>
             <input name="email"
                     type="text"
                     minlength=5
@@ -283,14 +350,14 @@
                     size=25
                     pattern="[^@ \t\r\n]+@[^@]+\.[^@]+"
                     title="your email address"
-                    requred /><br/>
+                    required /><br/>
             <input name="password"
                     type="password"
                     minlength=5
                     placeholder="password"
                     size=25
                     title="your password"
-                    requred />
+                    required />
             <input type="hidden" name="restaurant_id" value="{{ restaurant.id }}"/>
             <input type="submit" value="join"/>
         </form>

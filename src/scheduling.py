@@ -247,6 +247,25 @@ def create_app(storage_url, source_dir, template_dir):
 
         return redirect(f"/restaurant/{restaurant_id}")
 
+    @app.route(
+        "/restaurant/<restaurant_id>/shift/<shift_id>/add_role", methods=["POST"]
+    )
+    def add_restaurant_shift_role(restaurant_id, shift_id):
+        """adds shifts to a restaurant"""
+        user = database.get_user(request.cookies.get(USER_ID_COOKIE))
+        restaurant = database.get_restaurant(restaurant_id)
+        shifts = [s for s in restaurant.shifts if s.id == int(shift_id)]
+        role_id = int(request.form["role_id"])
+        roles = [r for r in restaurant.roles if r.id == int(role_id)]
+        number = int(request.form["number"])
+        if user is None or restaurant is None or not shifts or not roles:
+            return (render_template("404.html", path="???"), 404)
+        shift = shifts[0]  # TODO: assert only one shift # pylint: disable=W0511
+        role = roles[0]  # TODO: assert only one role # pylint: disable=W0511
+        database.add_role_to_shift(shift, role, number)
+        database.flush()
+        return redirect(f"/restaurant/{restaurant_id}")
+
     # Mark: Actual websites
 
     @app.route("/welcome")
@@ -352,8 +371,11 @@ def parse_args():
         default="ui",
         help="Path to the directory with ui files.",
     )
-    parser.add_argument("-d", "--debug", default=True, help="Run debug server.")
+    parser.add_argument("-d", "--debug", default=False, help="Run debug server.")
     args = parser.parse_args()
+
+    if args.test:
+        args.debug = True
 
     return args
 
