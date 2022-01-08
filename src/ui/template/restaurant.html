@@ -22,6 +22,7 @@
                         {% for preference in employee.roles %}
                         {% if preference.role.restaurant_id == restaurant.id %}
                             "{{ preference.role.name}}": {
+                                "id": {{ preference.role.id }},
                                 "priority": {{ preference.priority }},
                                 "gm_priority": {{ preference.gm_priority }}
                             },
@@ -30,22 +31,46 @@
                     },
                     "availability": [
                         {% for availability in employee.availabilities %}
-                        {% if availability.restaurant.id == restaurant.id %}
+                        {% if availability.restaurant.id == restaurant.id
+                                and availability.start_date < now and now < availability.end_date  %}
                             {
                                 "day_of_week": {{ availability.day_of_week}},
-                                "start_date": {{ availability.start_date }},
-                                "end_date": {{ availability.end_date }},
                                 "start_date": "{{ availability.start_date }}",
                                 "end_date": "{{ availability.end_date }}",
                                 "start_time" : {{ availability.start_time }},
                                 "end_time": {{ availability.end_time }},
                                 "priority": {{ availability.priority }},
-                                "note": {{ availability. note }}
+                                "note": "{{ availability. note }}"
                             },
                         {% endif %}
                         {% endfor %}
                     ]
                 },
+            {% endfor %}
+        ];
+
+        var shifts = [
+            {% for shift in restaurant.shifts %}
+            {% if shift.start_date < now and now < shift.end_date %}
+                {
+                    "id": {{ shift.id }},
+                    "day_of_week": {{ shift.day_of_week}},
+                    "start_date": "{{ shift.start_date }}",
+                    "end_date": "{{ shift.end_date }}",
+                    "start_time" : {{ shift.start_time }},
+                    "end_time": {{ shift.end_time }},
+                    "priority": {{ shift.priority }},
+                    "roles" : [
+                    {% for role in shift.roles %}
+                        {
+                            "role": "{{ role.role.name }}",
+                            "id": "{{ role.role.id }}",
+                            "number": {{ role.number }}
+                        },
+                    {% endfor %}
+                    ]
+                },
+            {% endif %}
             {% endfor %}
         ];
     {% endif %}
