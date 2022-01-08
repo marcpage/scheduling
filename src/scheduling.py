@@ -332,6 +332,7 @@ def create_app(storage_url, source_dir, template_dir):
             user_roles=gm_user_roles,
             user_restaurant_roles=user_restaurant_roles,
             today=time.strftime("%Y-%m-%d"),
+            now=datetime.datetime.now(),
             employees=list(employees_by_id.values()),
             latest_date=time.strftime(
                 "%Y-%m-%d", time.localtime(time.time() + MAXIMUM_FUTURE_DATE_IN_SECONDS)
