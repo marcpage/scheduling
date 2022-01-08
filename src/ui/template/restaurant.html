@@ -76,8 +76,12 @@
     {% endif %}
 
     </script>
-
+    <script src="/shift_scheduling.js"></script>
+{% if user.id == restaurant.gm_id %}
+<body onload="update_shift_editor(employees, shifts, 'shift_editor')">
+{% else %}
 <body>
+{% endif %}
 
 <h1>{{ restaurant.name }}</h1>
 
@@ -105,6 +109,9 @@
         <a href="/logout">logout</a><br/>
         Welcome, {{ user.name }}
 
+        <div id="shift_editor">
+            This is where the shift editor will go
+        </div>
         <h2>Roles</h2>
         <ul>
         {% for role in restaurant.roles %}
