@@ -79,7 +79,7 @@
     </script>
     <script src="/shift_scheduling.js"></script>
 {% if user.id == restaurant.gm_id %}
-<body onload="update_shift_editor(employees, shifts, 'shift_editor')">
+<body onload="updateShiftEditor(employees, shifts, 'shift_editor')">
 {% else %}
 <body>
 {% endif %}
