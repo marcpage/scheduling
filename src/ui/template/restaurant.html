@@ -34,6 +34,7 @@
                         {% if availability.restaurant.id == restaurant.id
                                 and availability.start_date < now and now < availability.end_date  %}
                             {
+                                "id": {{ availability.id}},
                                 "day_of_week": {{ availability.day_of_week}},
                                 "start_date": "{{ availability.start_date }}",
                                 "end_date": "{{ availability.end_date }}",
@@ -108,9 +109,11 @@
 
         <a href="/logout">logout</a><br/>
         Welcome, {{ user.name }}
-
-        <div id="shift_editor">
-            This is where the shift editor will go
+        <div>
+            <h2>Shifts for scheduling</h2>
+            <div id="shift_editor">
+                This is where the shift editor will go
+            </div>
         </div>
         <h2>Roles</h2>
         <ul>
